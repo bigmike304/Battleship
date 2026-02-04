@@ -1,4 +1,5 @@
 import { GRID_SIZE, CELL_STATES } from '../engine/board.js';
+import { GAME_STATES } from '../engine/game.js';
 
 export class Renderer {
   constructor(game) {
@@ -108,6 +109,19 @@ export class Renderer {
     const overlay = document.querySelector('.game-over');
     if (overlay) {
       overlay.remove();
+    }
+  }
+
+  updateControlsVisibility(state) {
+    const setupControls = document.getElementById('setup-controls');
+    const gameControls = document.getElementById('game-controls');
+
+    if (state === GAME_STATES.SETUP_PLAYER) {
+      setupControls.style.display = 'block';
+      gameControls.style.display = 'none';
+    } else {
+      setupControls.style.display = 'none';
+      gameControls.style.display = 'block';
     }
   }
 }

@@ -10,8 +10,24 @@ export class EventHandler {
 
   initialize() {
     this.setupBoardClickHandler();
+    this.setupSetupHandlers();
     this.setupRestartHandler();
     this.setupGameCallbacks();
+  }
+
+  setupSetupHandlers() {
+    const randomizeBtn = document.getElementById('randomize-btn');
+    const startBtn = document.getElementById('start-btn');
+
+    randomizeBtn.addEventListener('click', () => {
+      this.game.randomizePlayerShips();
+      this.renderer.updateControlsVisibility(this.game.state);
+    });
+
+    startBtn.addEventListener('click', () => {
+      this.game.startGame();
+      this.renderer.updateControlsVisibility(this.game.state);
+    });
   }
 
   setupBoardClickHandler() {
@@ -22,7 +38,7 @@ export class EventHandler {
         return;
       }
 
-      if (this.game.state !== GAME_STATES.PLAYING || !this.game.isPlayerTurn) {
+      if (this.game.state !== GAME_STATES.PLAYER_TURN) {
         return;
       }
 
@@ -36,6 +52,7 @@ export class EventHandler {
 
         if (this.game.state === GAME_STATES.GAME_OVER) {
           this.renderer.showGameOver(this.game.winner);
+          this.renderer.updateControlsVisibility(this.game.state);
           return;
         }
 
@@ -45,7 +62,7 @@ export class EventHandler {
   }
 
   executeAiTurn() {
-    if (this.game.state !== GAME_STATES.PLAYING || this.game.isPlayerTurn) {
+    if (this.game.state !== GAME_STATES.AI_TURN) {
       return;
     }
 
@@ -58,11 +75,12 @@ export class EventHandler {
     const result = this.game.aiAttack(move.row, move.col);
 
     if (result) {
-      this.ai.recordAttack(move.row, move.col, result);
+      this.ai.recordAttack(move.row, move.col);
       this.renderer.renderBoards();
 
       if (this.game.state === GAME_STATES.GAME_OVER) {
         this.renderer.showGameOver(this.game.winner);
+        this.renderer.updateControlsVisibility(this.game.state);
       }
     }
   }
@@ -75,6 +93,7 @@ export class EventHandler {
       this.renderer.hideGameOver();
       this.renderer.clearMessages();
       this.game.restart();
+      this.renderer.updateControlsVisibility(this.game.state);
     });
   }
 
@@ -85,6 +104,7 @@ export class EventHandler {
 
     this.game.onUpdate = () => {
       this.renderer.renderBoards();
+      this.renderer.updateControlsVisibility(this.game.state);
     };
   }
 }

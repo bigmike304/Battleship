@@ -12,24 +12,19 @@ describe('Game', () => {
   });
 
   describe('initialize', () => {
-    it('should set game state to PLAYING after initialization', () => {
+    it('should set game state to SETUP_PLAYER after initialization', () => {
       game.initialize();
-      expect(game.state).toBe(GAME_STATES.PLAYING);
+      expect(game.state).toBe(GAME_STATES.SETUP_PLAYER);
     });
 
-    it('should place 5 ships on player board', () => {
+    it('should have empty player board initially', () => {
       game.initialize();
-      expect(game.playerBoard.ships.length).toBe(5);
+      expect(game.playerBoard.ships.length).toBe(0);
     });
 
-    it('should place 5 ships on AI board', () => {
+    it('should have empty AI board initially', () => {
       game.initialize();
-      expect(game.aiBoard.ships.length).toBe(5);
-    });
-
-    it('should set player turn to true', () => {
-      game.initialize();
-      expect(game.isPlayerTurn).toBe(true);
+      expect(game.aiBoard.ships.length).toBe(0);
     });
 
     it('should have no winner initially', () => {
@@ -38,56 +33,107 @@ describe('Game', () => {
     });
   });
 
-  describe('playerAttack', () => {
+  describe('randomizePlayerShips', () => {
     beforeEach(() => {
       game.initialize();
     });
 
+    it('should place 5 ships on player board', () => {
+      game.randomizePlayerShips();
+      expect(game.playerBoard.ships.length).toBe(5);
+    });
+
+    it('should return true when in SETUP_PLAYER state', () => {
+      const result = game.randomizePlayerShips();
+      expect(result).toBe(true);
+    });
+
+    it('should return false when not in SETUP_PLAYER state', () => {
+      game.state = GAME_STATES.PLAYER_TURN;
+      const result = game.randomizePlayerShips();
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('startGame', () => {
+    beforeEach(() => {
+      game.initialize();
+    });
+
+    it('should return false if player ships not placed', () => {
+      const result = game.startGame();
+      expect(result).toBe(false);
+    });
+
+    it('should set state to PLAYER_TURN after starting', () => {
+      game.randomizePlayerShips();
+      game.startGame();
+      expect(game.state).toBe(GAME_STATES.PLAYER_TURN);
+    });
+
+    it('should place 5 ships on AI board', () => {
+      game.randomizePlayerShips();
+      game.startGame();
+      expect(game.aiBoard.ships.length).toBe(5);
+    });
+  });
+
+  describe('playerAttack', () => {
+    beforeEach(() => {
+      game.initialize();
+      game.randomizePlayerShips();
+      game.startGame();
+    });
+
     it('should return null when not player turn', () => {
-      game.isPlayerTurn = false;
+      game.state = GAME_STATES.AI_TURN;
       const result = game.playerAttack(0, 0);
       expect(result).toBeNull();
     });
 
-    it('should return null when game is not in PLAYING state', () => {
+    it('should return null when game is not in PLAYER_TURN state', () => {
       game.state = GAME_STATES.GAME_OVER;
       const result = game.playerAttack(0, 0);
       expect(result).toBeNull();
     });
 
-    it('should switch turn to AI after valid attack', () => {
+    it('should switch state to AI_TURN after valid attack', () => {
       game.playerAttack(0, 0);
-      expect(game.isPlayerTurn).toBe(false);
+      expect(game.state).toBe(GAME_STATES.AI_TURN);
     });
   });
 
   describe('aiAttack', () => {
     beforeEach(() => {
       game.initialize();
-      game.isPlayerTurn = false;
+      game.randomizePlayerShips();
+      game.startGame();
+      game.state = GAME_STATES.AI_TURN;
     });
 
     it('should return null when it is player turn', () => {
-      game.isPlayerTurn = true;
+      game.state = GAME_STATES.PLAYER_TURN;
       const result = game.aiAttack(0, 0);
       expect(result).toBeNull();
     });
 
-    it('should switch turn to player after valid attack', () => {
+    it('should switch state to PLAYER_TURN after valid attack', () => {
       game.aiAttack(0, 0);
-      expect(game.isPlayerTurn).toBe(true);
+      expect(game.state).toBe(GAME_STATES.PLAYER_TURN);
     });
   });
 
   describe('win detection', () => {
     it('should detect player win when all AI ships are sunk', () => {
       game.initialize();
+      game.randomizePlayerShips();
+      game.startGame();
       
       for (const ship of game.aiBoard.ships) {
         for (const pos of ship.positions) {
           game.playerAttack(pos.row, pos.col);
           if (game.state !== GAME_STATES.GAME_OVER) {
-            game.isPlayerTurn = true;
+            game.state = GAME_STATES.PLAYER_TURN;
           }
         }
       }
@@ -98,13 +144,15 @@ describe('Game', () => {
 
     it('should detect AI win when all player ships are sunk', () => {
       game.initialize();
-      game.isPlayerTurn = false;
+      game.randomizePlayerShips();
+      game.startGame();
+      game.state = GAME_STATES.AI_TURN;
       
       for (const ship of game.playerBoard.ships) {
         for (const pos of ship.positions) {
           game.aiAttack(pos.row, pos.col);
           if (game.state !== GAME_STATES.GAME_OVER) {
-            game.isPlayerTurn = false;
+            game.state = GAME_STATES.AI_TURN;
           }
         }
       }
@@ -115,6 +163,8 @@ describe('Game', () => {
 
     it('should require exactly 17 hits to win (5+4+3+3+2)', () => {
       game.initialize();
+      game.randomizePlayerShips();
+      game.startGame();
       
       let hitCount = 0;
       for (const ship of game.aiBoard.ships) {
@@ -122,7 +172,7 @@ describe('Game', () => {
           game.playerAttack(pos.row, pos.col);
           hitCount++;
           if (game.state !== GAME_STATES.GAME_OVER) {
-            game.isPlayerTurn = true;
+            game.state = GAME_STATES.PLAYER_TURN;
           }
         }
       }
@@ -133,11 +183,13 @@ describe('Game', () => {
   });
 
   describe('restart', () => {
-    it('should reset game state to PLAYING', () => {
+    it('should reset game state to SETUP_PLAYER', () => {
       game.initialize();
+      game.randomizePlayerShips();
+      game.startGame();
       game.state = GAME_STATES.GAME_OVER;
       game.restart();
-      expect(game.state).toBe(GAME_STATES.PLAYING);
+      expect(game.state).toBe(GAME_STATES.SETUP_PLAYER);
     });
 
     it('should reset winner to null', () => {
@@ -147,22 +199,15 @@ describe('Game', () => {
       expect(game.winner).toBeNull();
     });
 
-    it('should reset player turn to true', () => {
+    it('should clear ships from both boards', () => {
       game.initialize();
-      game.isPlayerTurn = false;
-      game.restart();
-      expect(game.isPlayerTurn).toBe(true);
-    });
-
-    it('should place new ships on both boards', () => {
-      game.initialize();
-      const oldPlayerShips = [...game.playerBoard.ships];
-      const oldAiShips = [...game.aiBoard.ships];
+      game.randomizePlayerShips();
+      game.startGame();
       
       game.restart();
       
-      expect(game.playerBoard.ships.length).toBe(5);
-      expect(game.aiBoard.ships.length).toBe(5);
+      expect(game.playerBoard.ships.length).toBe(0);
+      expect(game.aiBoard.ships.length).toBe(0);
     });
   });
 });

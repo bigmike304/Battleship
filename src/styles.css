@@ -123,11 +123,20 @@ h2 {
   transform: none;
 }
 
-#controls {
+#setup-controls,
+#game-controls {
   text-align: center;
   margin-bottom: 20px;
 }
 
+#setup-controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+#randomize-btn,
+#start-btn,
 #restart-btn {
   padding: 12px 30px;
   font-size: 1rem;
@@ -140,9 +149,19 @@ h2 {
   transition: background-color 0.2s, transform 0.1s;
 }
 
+#randomize-btn:hover,
+#start-btn:hover,
 #restart-btn:hover {
   background-color: #81d4fa;
   transform: scale(1.05);
+}
+
+#start-btn {
+  background-color: #66bb6a;
+}
+
+#start-btn:hover {
+  background-color: #81c784;
 }
 
 #message-log {
