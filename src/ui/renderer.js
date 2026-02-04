@@ -1,6 +1,7 @@
 import { GRID_SIZE, CELL_STATES } from '../engine/board.js';
 import { GAME_STATES, PLACEMENT_MODES } from '../engine/game.js';
 import { SHIP_TYPES } from '../engine/ship.js';
+import { toClassicCoord } from '../ai/aiCore.js';
 
 // Map ship names to CSS class suffixes
 const SHIP_CLASS_MAP = {
@@ -237,9 +238,11 @@ export class Renderer {
     const gameControls = document.getElementById('game-controls');
     const randomizeBtn = document.getElementById('randomize-btn');
     const startBtn = document.getElementById('start-btn');
+    const difficultySelector = document.getElementById('difficulty-selector');
 
     if (state === GAME_STATES.SETUP_PLAYER) {
       gameControls.style.display = 'none';
+      difficultySelector.style.display = 'block';
       
       if (placementMode === PLACEMENT_MODES.NONE || !placementMode) {
         // Show mode selection, hide everything else
@@ -270,7 +273,48 @@ export class Renderer {
       shipTrayContainer.style.display = 'none';
       setupControls.style.display = 'none';
       gameControls.style.display = 'block';
+      difficultySelector.style.display = 'none';
       this.setPlacementMode(false);
     }
+    
+    // Update phase indicator
+    this.updatePhaseIndicator(state);
+  }
+
+  // Update the phase indicator based on game state
+  updatePhaseIndicator(state) {
+    const phaseText = document.getElementById('phase-text');
+    if (!phaseText) return;
+
+    // Remove all phase classes
+    phaseText.classList.remove('setup', 'your-turn', 'ai-turn', 'game-over');
+
+    switch (state) {
+      case GAME_STATES.SETUP_PLAYER:
+      case GAME_STATES.SETUP_AI:
+        phaseText.textContent = 'Setup';
+        phaseText.classList.add('setup');
+        break;
+      case GAME_STATES.PLAYER_TURN:
+        phaseText.textContent = 'Your Turn';
+        phaseText.classList.add('your-turn');
+        break;
+      case GAME_STATES.AI_TURN:
+        phaseText.textContent = 'AI Turn';
+        phaseText.classList.add('ai-turn');
+        break;
+      case GAME_STATES.GAME_OVER:
+        phaseText.textContent = 'Game Over';
+        phaseText.classList.add('game-over');
+        break;
+      default:
+        phaseText.textContent = 'Setup';
+        phaseText.classList.add('setup');
+    }
+  }
+
+  // Format coordinate in classic style (e.g., "B7")
+  formatCoord(row, col) {
+    return toClassicCoord(row, col);
   }
 }

@@ -1,4 +1,5 @@
 import { GAME_STATES, PLACEMENT_MODES } from '../engine/game.js';
+import { AI_DIFFICULTY } from '../ai/aiCore.js';
 
 export class EventHandler {
   constructor(game, ai, renderer) {
@@ -13,6 +14,7 @@ export class EventHandler {
   }
 
   initialize() {
+    this.setupDifficultyHandler();
     this.setupPlacementModeHandlers();
     this.setupManualPlacementHandlers();
     this.setupBoardClickHandler();
@@ -20,6 +22,16 @@ export class EventHandler {
     this.setupRestartHandler();
     this.setupGameCallbacks();
     this.setupKeyboardHandlers();
+  }
+
+  // Handle AI difficulty selection
+  setupDifficultyHandler() {
+    const difficultySelect = document.getElementById('difficulty-select');
+    
+    difficultySelect.addEventListener('change', (e) => {
+      const difficulty = e.target.value;
+      this.ai.setDifficulty(difficulty);
+    });
   }
 
   // Handle placement mode selection (Manual vs Random)
@@ -207,6 +219,9 @@ export class EventHandler {
       return;
     }
 
+    // Update phase indicator to show AI turn
+    this.renderer.updatePhaseIndicator(this.game.state);
+
     const move = this.ai.getNextMove(this.game.playerBoard);
 
     if (!move) {
@@ -216,8 +231,10 @@ export class EventHandler {
     const result = this.game.aiAttack(move.row, move.col);
 
     if (result) {
-      this.ai.recordAttack(move.row, move.col);
+      // Pass the result to recordAttack so AI can update its state
+      this.ai.recordAttack(move.row, move.col, result);
       this.renderer.renderBoards();
+      this.renderer.updatePhaseIndicator(this.game.state);
 
       if (this.game.state === GAME_STATES.GAME_OVER) {
         this.renderer.showGameOver(this.game.winner);
@@ -242,6 +259,7 @@ export class EventHandler {
       this.renderer.clearMessages();
       this.game.restart();
       this.renderer.updateControlsVisibility(this.game.state, this.game.placementMode);
+      this.renderer.updatePhaseIndicator(this.game.state);
     });
   }
 
