@@ -4,11 +4,42 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Battleship</title>
+    <link rel="stylesheet" href="css/theme.css" />
     <link rel="stylesheet" href="/src/styles.css" />
   </head>
   <body>
     <div id="app">
       <h1>Battleship</h1>
+      
+      <!-- Placement Mode Selection -->
+      <div id="placement-mode-selection">
+        <h3>Choose Placement Mode</h3>
+        <div class="mode-buttons">
+          <button id="manual-mode-btn" class="icon-btn">
+            <img src="assets/ui/manual.svg" alt="Manual" />
+            <span>Manual Placement</span>
+          </button>
+          <button id="random-mode-btn" class="icon-btn">
+            <img src="assets/ui/random.svg" alt="Random" />
+            <span>Random Placement</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Ship Tray for Manual Placement -->
+      <div id="ship-tray-container" style="display: none;">
+        <h3>Place Your Ships</h3>
+        <div id="ship-tray" class="ship-tray"></div>
+        <div id="placement-controls">
+          <button id="rotate-btn" class="icon-btn">
+            <img src="assets/ui/rotate.svg" alt="Rotate" />
+            <span>Rotate (R)</span>
+          </button>
+          <button id="clear-placement-btn">Clear All</button>
+        </div>
+        <p id="placement-instructions">Click a ship to select, then click on the board to place. Right-click or press R to rotate.</p>
+      </div>
+
       <div id="game-container">
         <div id="player-section">
           <h2>Your Fleet</h2>
@@ -20,7 +51,7 @@
         </div>
       </div>
       <div id="setup-controls">
-        <button id="randomize-btn">Randomize My Ships</button>
+        <button id="randomize-btn" style="display: none;">Randomize My Ships</button>
         <button id="start-btn">Start Game</button>
       </div>
       <div id="game-controls">

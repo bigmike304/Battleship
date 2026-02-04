@@ -1,5 +1,24 @@
 import { GRID_SIZE, CELL_STATES } from '../engine/board.js';
-import { GAME_STATES } from '../engine/game.js';
+import { GAME_STATES, PLACEMENT_MODES } from '../engine/game.js';
+import { SHIP_TYPES } from '../engine/ship.js';
+
+// Map ship names to CSS class suffixes
+const SHIP_CLASS_MAP = {
+  'Carrier': 'carrier',
+  'Battleship': 'battleship',
+  'Cruiser': 'cruiser',
+  'Submarine': 'submarine',
+  'Destroyer': 'destroyer',
+};
+
+// Map ship names to asset file names
+const SHIP_ASSET_MAP = {
+  'Carrier': 'carrier.svg',
+  'Battleship': 'battleship.svg',
+  'Cruiser': 'cruiser.svg',
+  'Submarine': 'submarine.svg',
+  'Destroyer': 'destroyer.svg',
+};
 
 export class Renderer {
   constructor(game) {
@@ -7,6 +26,7 @@ export class Renderer {
     this.playerBoardEl = document.getElementById('player-board');
     this.enemyBoardEl = document.getElementById('enemy-board');
     this.messagesEl = document.getElementById('messages');
+    this.shipTrayEl = document.getElementById('ship-tray');
   }
 
   renderBoards() {
@@ -26,17 +46,35 @@ export class Renderer {
         cellEl.dataset.col = col;
 
         if (isEnemy) {
+          // Enemy board: only show hits, misses, and sunk ships
           if (cell.state === CELL_STATES.HIT) {
             cellEl.classList.add('hit');
           } else if (cell.state === CELL_STATES.MISS) {
             cellEl.classList.add('miss');
           } else if (cell.state === CELL_STATES.SUNK) {
             cellEl.classList.add('sunk');
+            // Add ship sprite for sunk enemy ships
+            const ship = board.ships.find(s => s.id === cell.shipId);
+            if (ship) {
+              const shipClass = SHIP_CLASS_MAP[ship.name];
+              if (shipClass) {
+                cellEl.classList.add('ship', `ship--${shipClass}`);
+              }
+            }
           }
         } else {
-          if (cell.state === CELL_STATES.SHIP) {
-            cellEl.classList.add('ship');
-          } else if (cell.state === CELL_STATES.HIT) {
+          // Player board: show ships with sprites
+          if (cell.state === CELL_STATES.SHIP || cell.state === CELL_STATES.HIT || cell.state === CELL_STATES.SUNK) {
+            const ship = board.ships.find(s => s.id === cell.shipId);
+            if (ship) {
+              const shipClass = SHIP_CLASS_MAP[ship.name];
+              if (shipClass) {
+                cellEl.classList.add('ship', `ship--${shipClass}`);
+              }
+            }
+          }
+          
+          if (cell.state === CELL_STATES.HIT) {
             cellEl.classList.add('hit');
           } else if (cell.state === CELL_STATES.MISS) {
             cellEl.classList.add('miss');
@@ -47,6 +85,86 @@ export class Renderer {
 
         boardEl.appendChild(cellEl);
       }
+    }
+  }
+
+  // Render the ship tray for manual placement
+  renderShipTray(selectedShipId = null) {
+    if (!this.shipTrayEl) return;
+    
+    this.shipTrayEl.innerHTML = '';
+    const ships = this.game.getFleetShips();
+    
+    for (const ship of ships) {
+      const isPlaced = this.game.isShipPlaced(ship.id);
+      const isSelected = ship.id === selectedShipId;
+      
+      const pieceEl = document.createElement('div');
+      pieceEl.className = 'ship-piece';
+      pieceEl.dataset.shipId = ship.id;
+      
+      if (isPlaced) {
+        pieceEl.classList.add('placed');
+      }
+      if (isSelected) {
+        pieceEl.classList.add('selected');
+      }
+      
+      // Ship image
+      const imgEl = document.createElement('img');
+      imgEl.src = `assets/ships/${SHIP_ASSET_MAP[ship.name]}`;
+      imgEl.alt = ship.name;
+      
+      // Ship info
+      const infoEl = document.createElement('div');
+      infoEl.innerHTML = `
+        <div class="label">${ship.name}</div>
+        <div class="meta">${ship.length} cells</div>
+      `;
+      
+      pieceEl.appendChild(imgEl);
+      pieceEl.appendChild(infoEl);
+      this.shipTrayEl.appendChild(pieceEl);
+    }
+  }
+
+  // Show placement preview on the board
+  showPlacementPreview(ship, startRow, startCol, isHorizontal) {
+    this.clearPlacementPreview();
+    
+    if (!ship) return;
+    
+    const isValid = this.game.isValidPlacement(ship, startRow, startCol, isHorizontal);
+    
+    for (let i = 0; i < ship.length; i++) {
+      const row = isHorizontal ? startRow : startRow + i;
+      const col = isHorizontal ? startCol + i : startCol;
+      
+      if (row >= 0 && row < GRID_SIZE && col >= 0 && col < GRID_SIZE) {
+        const cellEl = this.playerBoardEl.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+        if (cellEl) {
+          cellEl.classList.add('placement-preview');
+          cellEl.classList.add(isValid ? 'valid' : 'invalid');
+        }
+      }
+    }
+  }
+
+  // Clear placement preview
+  clearPlacementPreview() {
+    const previewCells = this.playerBoardEl.querySelectorAll('.placement-preview');
+    previewCells.forEach(cell => {
+      cell.classList.remove('placement-preview', 'valid', 'invalid');
+    });
+  }
+
+  // Set player board to placement mode
+  setPlacementMode(enabled) {
+    if (enabled) {
+      this.playerBoardEl.classList.add('placement-mode');
+    } else {
+      this.playerBoardEl.classList.remove('placement-mode');
+      this.clearPlacementPreview();
     }
   }
 
@@ -112,16 +230,47 @@ export class Renderer {
     }
   }
 
-  updateControlsVisibility(state) {
+  updateControlsVisibility(state, placementMode = null) {
+    const placementModeSelection = document.getElementById('placement-mode-selection');
+    const shipTrayContainer = document.getElementById('ship-tray-container');
     const setupControls = document.getElementById('setup-controls');
     const gameControls = document.getElementById('game-controls');
+    const randomizeBtn = document.getElementById('randomize-btn');
+    const startBtn = document.getElementById('start-btn');
 
     if (state === GAME_STATES.SETUP_PLAYER) {
-      setupControls.style.display = 'block';
       gameControls.style.display = 'none';
+      
+      if (placementMode === PLACEMENT_MODES.NONE || !placementMode) {
+        // Show mode selection, hide everything else
+        placementModeSelection.style.display = 'block';
+        shipTrayContainer.style.display = 'none';
+        setupControls.style.display = 'none';
+        this.setPlacementMode(false);
+      } else if (placementMode === PLACEMENT_MODES.MANUAL) {
+        // Manual placement mode
+        placementModeSelection.style.display = 'none';
+        shipTrayContainer.style.display = 'block';
+        setupControls.style.display = 'flex';
+        randomizeBtn.style.display = 'none';
+        startBtn.disabled = !this.game.allShipsPlaced();
+        this.setPlacementMode(true);
+      } else if (placementMode === PLACEMENT_MODES.RANDOM) {
+        // Random placement mode
+        placementModeSelection.style.display = 'none';
+        shipTrayContainer.style.display = 'none';
+        setupControls.style.display = 'flex';
+        randomizeBtn.style.display = 'block';
+        startBtn.disabled = this.game.playerBoard.ships.length === 0;
+        this.setPlacementMode(false);
+      }
     } else {
+      // Game in progress or game over
+      placementModeSelection.style.display = 'none';
+      shipTrayContainer.style.display = 'none';
       setupControls.style.display = 'none';
       gameControls.style.display = 'block';
+      this.setPlacementMode(false);
     }
   }
 }

@@ -1,34 +1,34 @@
+/* Base styles - theme.css provides the main styling */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #1a1a2e;
-  color: #eee;
-  min-height: 100vh;
-  padding: 20px;
-}
-
 #app {
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
+  padding: 20px;
 }
 
 h1 {
   text-align: center;
   margin-bottom: 20px;
-  color: #4fc3f7;
+  color: var(--accent);
   font-size: 2.5rem;
 }
 
 h2 {
   text-align: center;
   margin-bottom: 10px;
-  color: #81d4fa;
+  color: var(--accent);
   font-size: 1.2rem;
+}
+
+h3 {
+  text-align: center;
+  margin-bottom: 15px;
+  color: var(--text);
 }
 
 #game-container {
@@ -46,83 +46,161 @@ h2 {
   align-items: center;
 }
 
-.board {
-  display: grid;
-  grid-template-columns: repeat(10, 35px);
-  grid-template-rows: repeat(10, 35px);
-  gap: 2px;
-  background-color: #16213e;
-  padding: 10px;
-  border-radius: 8px;
-  border: 2px solid #4fc3f7;
+/* Placement Mode Selection */
+#placement-mode-selection {
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  background: var(--panel);
 }
 
-.cell {
-  width: 35px;
-  height: 35px;
-  background-color: #0f3460;
-  border: 1px solid #1a1a2e;
-  border-radius: 4px;
+#placement-mode-selection .mode-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+#placement-mode-selection .icon-btn {
+  padding: 15px 25px;
+  font-size: 1rem;
+}
+
+#placement-mode-selection .icon-btn img {
+  width: 24px;
+  height: 24px;
+}
+
+/* Ship Tray Container */
+#ship-tray-container {
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+#ship-tray {
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+#placement-controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+#placement-instructions {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Ship piece in tray */
+.ship-piece {
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  transition: transform 0.1s, border-color 0.2s;
 }
 
-.cell:hover {
-  background-color: #1e5f74;
+.ship-piece:hover {
+  transform: scale(1.02);
+  border-color: var(--accent);
+}
+
+.ship-piece.selected {
+  border-color: var(--accent);
+  background: rgba(119, 192, 255, 0.15);
+  box-shadow: 0 0 10px rgba(119, 192, 255, 0.3);
+}
+
+.ship-piece.placed {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Ship sprites on cells - per ship type */
+.cell.ship--carrier {
+  background-image: url("../assets/tiles/water.svg"), url("../assets/ships/carrier.svg");
+  background-size: cover, 90% 90%;
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, center;
+}
+
+.cell.ship--battleship {
+  background-image: url("../assets/tiles/water.svg"), url("../assets/ships/battleship.svg");
+  background-size: cover, 90% 90%;
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, center;
+}
+
+.cell.ship--cruiser {
+  background-image: url("../assets/tiles/water.svg"), url("../assets/ships/cruiser.svg");
+  background-size: cover, 90% 90%;
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, center;
+}
+
+.cell.ship--submarine {
+  background-image: url("../assets/tiles/water.svg"), url("../assets/ships/submarine.svg");
+  background-size: cover, 90% 90%;
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, center;
+}
+
+.cell.ship--destroyer {
+  background-image: url("../assets/tiles/water.svg"), url("../assets/ships/destroyer.svg");
+  background-size: cover, 90% 90%;
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, center;
+}
+
+/* Generic ship class for backwards compatibility */
+.cell.ship:not([class*="ship--"]) {
+  background-image: url("../assets/tiles/water.svg"), url("../assets/ships/destroyer.svg");
+  background-size: cover, 90% 90%;
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, center;
+}
+
+/* Placement preview */
+.cell.placement-preview {
+  background-image: url("../assets/tiles/water_hover.svg");
+  opacity: 0.7;
+}
+
+.cell.placement-preview.valid {
+  box-shadow: inset 0 0 0 2px var(--success);
+}
+
+.cell.placement-preview.invalid {
+  box-shadow: inset 0 0 0 2px var(--danger);
+}
+
+/* Sunk ships */
+.cell.sunk {
+  opacity: 0.6;
+}
+
+/* Enemy board hover during gameplay */
+#enemy-board .cell:not(.hit):not(.miss):not(.sunk):hover {
+  cursor: crosshair;
+}
+
+/* Player board during manual placement */
+#player-board.placement-mode .cell {
+  cursor: pointer;
+}
+
+#player-board.placement-mode .cell:hover {
   transform: scale(1.05);
 }
 
-.cell.ship {
-  background-color: #546e7a;
-}
-
-.cell.hit {
-  background-color: #e53935;
-  cursor: default;
-}
-
-.cell.hit::after {
-  content: 'X';
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  font-weight: bold;
-  color: #fff;
-}
-
-.cell.miss {
-  background-color: #37474f;
-  cursor: default;
-}
-
-.cell.miss::after {
-  content: '';
-  display: block;
-  width: 10px;
-  height: 10px;
-  background-color: #90a4ae;
-  border-radius: 50%;
-  margin: auto;
-  margin-top: 12px;
-}
-
-.cell.sunk {
-  background-color: #b71c1c;
-}
-
-#enemy-board .cell:not(.hit):not(.miss):hover {
-  background-color: #ff7043;
-}
-
-#player-board .cell {
-  cursor: default;
-}
-
-#player-board .cell:hover {
-  transform: none;
-}
-
+/* Setup and Game Controls */
 #setup-controls,
 #game-controls {
   text-align: center;
@@ -133,48 +211,36 @@ h2 {
   display: flex;
   justify-content: center;
   gap: 15px;
-}
-
-#randomize-btn,
-#start-btn,
-#restart-btn {
-  padding: 12px 30px;
-  font-size: 1rem;
-  background-color: #4fc3f7;
-  color: #1a1a2e;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s, transform 0.1s;
-}
-
-#randomize-btn:hover,
-#start-btn:hover,
-#restart-btn:hover {
-  background-color: #81d4fa;
-  transform: scale(1.05);
+  flex-wrap: wrap;
 }
 
 #start-btn {
-  background-color: #66bb6a;
+  background: var(--success);
+  color: var(--bg);
+  font-weight: 600;
 }
 
 #start-btn:hover {
-  background-color: #81c784;
+  background: #6aecc5;
 }
 
+#start-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Message Log */
 #message-log {
-  background-color: #16213e;
+  background: var(--panel);
   padding: 15px;
-  border-radius: 8px;
-  border: 2px solid #4fc3f7;
+  border-radius: var(--radius);
+  border: 1px solid var(--panel-border);
   max-height: 200px;
   overflow-y: auto;
 }
 
 #message-log h3 {
-  color: #4fc3f7;
+  color: var(--accent);
   margin-bottom: 10px;
   font-size: 1rem;
 }
@@ -186,7 +252,7 @@ h2 {
 
 .message {
   padding: 5px 0;
-  border-bottom: 1px solid #0f3460;
+  border-bottom: 1px solid var(--panel-border);
 }
 
 .message:last-child {
@@ -194,32 +260,33 @@ h2 {
 }
 
 .message.player {
-  color: #81d4fa;
+  color: var(--accent);
 }
 
 .message.ai {
-  color: #ffab91;
+  color: var(--danger);
 }
 
 .message.system {
-  color: #a5d6a7;
+  color: var(--success);
   font-weight: bold;
 }
 
+/* Game Over Overlay */
 .game-over {
   text-align: center;
   padding: 20px;
-  background-color: #16213e;
-  border-radius: 8px;
+  background: var(--panel);
+  border-radius: var(--radius);
   margin-bottom: 20px;
 }
 
 .game-over.win {
-  border: 3px solid #4caf50;
+  border: 3px solid var(--success);
 }
 
 .game-over.lose {
-  border: 3px solid #f44336;
+  border: 3px solid var(--danger);
 }
 
 .game-over h2 {
@@ -228,9 +295,25 @@ h2 {
 }
 
 .game-over.win h2 {
-  color: #4caf50;
+  color: var(--success);
 }
 
 .game-over.lose h2 {
-  color: #f44336;
+  color: var(--danger);
+}
+
+/* Mobile Responsive */
+@media (max-width: 720px) {
+  #game-container {
+    gap: 20px;
+  }
+  
+  #placement-mode-selection .mode-buttons {
+    flex-direction: column;
+  }
+  
+  #ship-tray {
+    flex-direction: column;
+    align-items: center;
+  }
 }
