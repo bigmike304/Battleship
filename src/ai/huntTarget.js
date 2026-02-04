@@ -8,20 +8,22 @@ export const AI_MODES = {
 export class HuntTargetAI {
   constructor() {
     this.mode = AI_MODES.HUNT;
-    this.targetQueue = [];
+    this.targetStack = [];
     this.attackedCells = new Set();
-    this.lastHit = null;
+    this.currentHits = [];
+    this.lineDirection = null;
   }
 
   reset() {
     this.mode = AI_MODES.HUNT;
-    this.targetQueue = [];
+    this.targetStack = [];
     this.attackedCells = new Set();
-    this.lastHit = null;
+    this.currentHits = [];
+    this.lineDirection = null;
   }
 
   getNextMove(playerBoard) {
-    if (this.mode === AI_MODES.TARGET && this.targetQueue.length > 0) {
+    if (this.mode === AI_MODES.TARGET && this.targetStack.length > 0) {
       return this.getTargetMove(playerBoard);
     }
 
@@ -30,7 +32,8 @@ export class HuntTargetAI {
   }
 
   getHuntMove(playerBoard) {
-    const availableCells = [];
+    const parityCells = [];
+    const nonParityCells = [];
 
     for (let row = 0; row < GRID_SIZE; row++) {
       for (let col = 0; col < GRID_SIZE; col++) {
@@ -40,23 +43,32 @@ export class HuntTargetAI {
           if (cell.state !== CELL_STATES.HIT && 
               cell.state !== CELL_STATES.MISS && 
               cell.state !== CELL_STATES.SUNK) {
-            availableCells.push({ row, col });
+            if ((row + col) % 2 === 0) {
+              parityCells.push({ row, col });
+            } else {
+              nonParityCells.push({ row, col });
+            }
           }
         }
       }
     }
 
-    if (availableCells.length === 0) {
-      return null;
+    if (parityCells.length > 0) {
+      const randomIndex = Math.floor(Math.random() * parityCells.length);
+      return parityCells[randomIndex];
     }
 
-    const randomIndex = Math.floor(Math.random() * availableCells.length);
-    return availableCells[randomIndex];
+    if (nonParityCells.length > 0) {
+      const randomIndex = Math.floor(Math.random() * nonParityCells.length);
+      return nonParityCells[randomIndex];
+    }
+
+    return null;
   }
 
   getTargetMove(playerBoard) {
-    while (this.targetQueue.length > 0) {
-      const target = this.targetQueue.shift();
+    while (this.targetStack.length > 0) {
+      const target = this.targetStack.pop();
       const key = `${target.row},${target.col}`;
 
       if (this.attackedCells.has(key)) {
@@ -82,14 +94,72 @@ export class HuntTargetAI {
     this.attackedCells.add(key);
 
     if (result.result === 'hit') {
-      this.lastHit = { row, col };
+      this.currentHits.push({ row, col });
       this.mode = AI_MODES.TARGET;
-      this.addAdjacentCells(row, col);
-    } else if (result.result === 'sunk') {
-      this.clearTargetsForSunkShip(result.ship);
       
-      if (this.targetQueue.length === 0) {
-        this.mode = AI_MODES.HUNT;
+      if (this.currentHits.length >= 2) {
+        this.detectAndPrioritizeLine();
+      } else {
+        this.addAdjacentCells(row, col);
+      }
+    } else if (result.result === 'sunk') {
+      this.clearTargetContext();
+    }
+  }
+
+  detectAndPrioritizeLine() {
+    if (this.currentHits.length < 2) {
+      return;
+    }
+
+    const first = this.currentHits[0];
+    const second = this.currentHits[1];
+
+    if (first.row === second.row) {
+      this.lineDirection = 'horizontal';
+    } else if (first.col === second.col) {
+      this.lineDirection = 'vertical';
+    } else {
+      return;
+    }
+
+    this.targetStack = [];
+
+    const sortedHits = [...this.currentHits].sort((a, b) => {
+      if (this.lineDirection === 'horizontal') {
+        return a.col - b.col;
+      }
+      return a.row - b.row;
+    });
+
+    const firstHit = sortedHits[0];
+    const lastHit = sortedHits[sortedHits.length - 1];
+
+    if (this.lineDirection === 'horizontal') {
+      if (this.isValidCell(firstHit.row, firstHit.col - 1)) {
+        const key = `${firstHit.row},${firstHit.col - 1}`;
+        if (!this.attackedCells.has(key)) {
+          this.targetStack.push({ row: firstHit.row, col: firstHit.col - 1, priority: 'high' });
+        }
+      }
+      if (this.isValidCell(lastHit.row, lastHit.col + 1)) {
+        const key = `${lastHit.row},${lastHit.col + 1}`;
+        if (!this.attackedCells.has(key)) {
+          this.targetStack.push({ row: lastHit.row, col: lastHit.col + 1, priority: 'high' });
+        }
+      }
+    } else {
+      if (this.isValidCell(firstHit.row - 1, firstHit.col)) {
+        const key = `${firstHit.row - 1},${firstHit.col}`;
+        if (!this.attackedCells.has(key)) {
+          this.targetStack.push({ row: firstHit.row - 1, col: firstHit.col, priority: 'high' });
+        }
+      }
+      if (this.isValidCell(lastHit.row + 1, lastHit.col)) {
+        const key = `${lastHit.row + 1},${lastHit.col}`;
+        if (!this.attackedCells.has(key)) {
+          this.targetStack.push({ row: lastHit.row + 1, col: lastHit.col, priority: 'high' });
+        }
       }
     }
   }
@@ -109,38 +179,22 @@ export class HuntTargetAI {
       if (this.isValidCell(newRow, newCol)) {
         const key = `${newRow},${newCol}`;
         if (!this.attackedCells.has(key)) {
-          const alreadyInQueue = this.targetQueue.some(
+          const alreadyInStack = this.targetStack.some(
             t => t.row === newRow && t.col === newCol
           );
-          if (!alreadyInQueue) {
-            this.targetQueue.push({ row: newRow, col: newCol });
+          if (!alreadyInStack) {
+            this.targetStack.push({ row: newRow, col: newCol });
           }
         }
       }
     }
   }
 
-  clearTargetsForSunkShip(ship) {
-    if (!ship || !ship.positions) {
-      return;
-    }
-
-    const sunkPositions = new Set(
-      ship.positions.map(pos => `${pos.row},${pos.col}`)
-    );
-
-    this.targetQueue = this.targetQueue.filter(target => {
-      const isAdjacentToSunk = ship.positions.some(pos => {
-        const rowDiff = Math.abs(target.row - pos.row);
-        const colDiff = Math.abs(target.col - pos.col);
-        return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
-      });
-
-      return !isAdjacentToSunk || this.targetQueue.some(t => {
-        const key = `${t.row},${t.col}`;
-        return !sunkPositions.has(key);
-      });
-    });
+  clearTargetContext() {
+    this.targetStack = [];
+    this.currentHits = [];
+    this.lineDirection = null;
+    this.mode = AI_MODES.HUNT;
   }
 
   isValidCell(row, col) {
