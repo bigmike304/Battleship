@@ -1,0 +1,126 @@
+/* Battleship theme pack (drop-in)
+   - Uses SVG assets in /assets
+   - Safe defaults; tweak CSS vars to taste
+*/
+
+:root{
+  --bg: #02111f;
+  --panel: rgba(255,255,255,.06);
+  --panel-border: rgba(255,255,255,.12);
+  --text: #e6f3ff;
+  --muted: rgba(230,243,255,.75);
+  --accent: #77c0ff;
+  --danger: #ff6a6a;
+  --success: #55e3b6;
+  --cell-size: 42px;
+  --cell-gap: 6px;
+  --radius: 14px;
+}
+
+body{
+  margin: 0;
+  background:
+    radial-gradient(1200px 800px at 20% 10%, rgba(119,192,255,.22), transparent 55%),
+    radial-gradient(900px 700px at 80% 30%, rgba(85,227,182,.18), transparent 55%),
+    radial-gradient(1200px 900px at 50% 120%, rgba(255,106,106,.08), transparent 55%),
+    var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+}
+
+button{
+  border: 1px solid var(--panel-border);
+  background: rgba(255,255,255,.08);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform .05s ease, background .15s ease;
+}
+button:hover{ background: rgba(255,255,255,.12); }
+button:active{ transform: translateY(1px); }
+
+.board{
+  display: grid;
+  grid-template-columns: repeat(10, var(--cell-size));
+  gap: var(--cell-gap);
+  padding: 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--panel-border);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  box-shadow: 0 20px 40px rgba(0,0,0,.25);
+}
+
+.cell{
+  width: var(--cell-size);
+  height: var(--cell-size);
+  border-radius: 10px;
+  background-image: url("../assets/tiles/water.svg");
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  user-select: none;
+}
+
+.cell:hover{
+  background-image: url("../assets/tiles/water_hover.svg");
+}
+
+.cell.ship{
+  /* ship image applied per-ship via inline style or data-attr */
+  background-image:
+    url("../assets/tiles/water.svg"),
+    url("../assets/ships/destroyer.svg");
+  background-size: cover, 90% 90%;
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, center;
+}
+
+.cell.hit::after{
+  content:"";
+  position:absolute; inset: 0;
+  background: url("../assets/markers/hit.svg") center/90% no-repeat;
+}
+
+.cell.miss::after{
+  content:"";
+  position:absolute; inset: 0;
+  background: url("../assets/markers/miss.svg") center/90% no-repeat;
+}
+
+/* Ship tray (manual placement) */
+.ship-tray{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.ship-piece{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  background: rgba(255,255,255,.06);
+}
+.ship-piece img{ width: 78px; height: 40px; object-fit: contain; }
+.ship-piece .label{ font-weight: 650; color: var(--text); }
+.ship-piece .meta{ color: var(--muted); font-size: 12px; }
+
+.icon-btn{
+  display:inline-flex;
+  align-items:center;
+  gap: 10px;
+}
+.icon-btn img{ width: 18px; height: 18px; }
+
+/* Mobile tweaks */
+@media (max-width: 720px){
+  :root{ --cell-size: 34px; --cell-gap: 5px; }
+  button{ width: 100%; }
+}

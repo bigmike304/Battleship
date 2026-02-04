@@ -11,7 +11,7 @@ const eventHandler = new EventHandler(game, ai, renderer);
 function init() {
   game.initialize();
   renderer.renderBoards();
-  renderer.updateControlsVisibility(game.state);
+  renderer.updateControlsVisibility(game.state, game.placementMode);
   eventHandler.initialize();
 }
 

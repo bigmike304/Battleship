@@ -1,5 +1,12 @@
 import { Board, GRID_SIZE } from './board.js';
-import { createFleet, resetShipIdCounter } from './ship.js';
+import { createFleet, resetShipIdCounter, SHIP_TYPES } from './ship.js';
+
+// Placement modes for setup phase
+export const PLACEMENT_MODES = {
+  NONE: 'none',
+  MANUAL: 'manual',
+  RANDOM: 'random',
+};
 
 export const GAME_STATES = {
   SETUP_PLAYER: 'setup_player',
@@ -14,9 +21,13 @@ export class Game {
     this.playerBoard = new Board();
     this.aiBoard = new Board();
     this.state = GAME_STATES.SETUP_PLAYER;
+    this.placementMode = PLACEMENT_MODES.NONE;
     this.winner = null;
     this.onMessage = null;
     this.onUpdate = null;
+    // Track ships for manual placement
+    this.playerFleet = [];
+    this.placedShips = new Set();
   }
 
   initialize() {
@@ -24,9 +35,99 @@ export class Game {
     this.playerBoard.reset();
     this.aiBoard.reset();
     this.state = GAME_STATES.SETUP_PLAYER;
+    this.placementMode = PLACEMENT_MODES.NONE;
     this.winner = null;
-    this.log('Click "Randomize My Ships" to place your fleet, then "Start Game" to begin.', 'system');
+    this.playerFleet = [];
+    this.placedShips = new Set();
+    this.log('Choose a placement mode to begin setting up your fleet.', 'system');
     this.triggerUpdate();
+  }
+
+  // Set the placement mode (manual or random)
+  setPlacementMode(mode) {
+    if (this.state !== GAME_STATES.SETUP_PLAYER) {
+      return false;
+    }
+    this.placementMode = mode;
+    
+    if (mode === PLACEMENT_MODES.MANUAL) {
+      // Create fleet for manual placement
+      this.playerFleet = createFleet();
+      this.placedShips = new Set();
+      this.log('Manual placement mode. Select a ship and click on the board to place it.', 'system');
+    } else if (mode === PLACEMENT_MODES.RANDOM) {
+      this.log('Random placement mode. Click "Randomize My Ships" to place your fleet.', 'system');
+    }
+    
+    this.triggerUpdate();
+    return true;
+  }
+
+  // Get ships available for manual placement
+  getAvailableShips() {
+    return this.playerFleet.filter(ship => !this.placedShips.has(ship.id));
+  }
+
+  // Get all ships in the fleet (for rendering the tray)
+  getFleetShips() {
+    return this.playerFleet;
+  }
+
+  // Check if a ship has been placed
+  isShipPlaced(shipId) {
+    return this.placedShips.has(shipId);
+  }
+
+  // Place a single ship manually
+  placePlayerShip(ship, startRow, startCol, isHorizontal) {
+    if (this.state !== GAME_STATES.SETUP_PLAYER || this.placementMode !== PLACEMENT_MODES.MANUAL) {
+      return false;
+    }
+
+    if (this.placedShips.has(ship.id)) {
+      this.log(`${ship.name} has already been placed!`, 'system');
+      return false;
+    }
+
+    const placed = this.playerBoard.placeShip(ship, startRow, startCol, isHorizontal);
+    
+    if (placed) {
+      this.placedShips.add(ship.id);
+      this.log(`${ship.name} placed successfully!`, 'system');
+      this.triggerUpdate();
+      return true;
+    } else {
+      this.log('Invalid placement! Ships cannot overlap or go out of bounds.', 'system');
+      return false;
+    }
+  }
+
+  // Check if placement is valid without actually placing
+  isValidPlacement(ship, startRow, startCol, isHorizontal) {
+    return this.playerBoard.isValidPlacement(ship, startRow, startCol, isHorizontal);
+  }
+
+  // Check if all ships have been placed
+  allShipsPlaced() {
+    return this.placedShips.size === this.playerFleet.length && this.playerFleet.length > 0;
+  }
+
+  // Clear all placed ships (for manual placement reset)
+  clearPlayerShips() {
+    if (this.state !== GAME_STATES.SETUP_PLAYER) {
+      return false;
+    }
+    
+    this.playerBoard.reset();
+    this.placedShips = new Set();
+    
+    // Recreate fleet with fresh ships
+    resetShipIdCounter();
+    this.playerFleet = createFleet();
+    
+    this.log('All ships cleared. Place your ships again.', 'system');
+    this.triggerUpdate();
+    return true;
   }
 
   randomizePlayerShips() {
@@ -47,8 +148,14 @@ export class Game {
       return false;
     }
 
-    if (this.playerBoard.ships.length === 0) {
-      this.log('Please randomize your ships first!', 'system');
+    // Check if ships are placed based on placement mode
+    if (this.placementMode === PLACEMENT_MODES.MANUAL) {
+      if (!this.allShipsPlaced()) {
+        this.log('Please place all your ships before starting!', 'system');
+        return false;
+      }
+    } else if (this.playerBoard.ships.length === 0) {
+      this.log('Please place your ships first!', 'system');
       return false;
     }
 
