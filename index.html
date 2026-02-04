@@ -11,16 +11,47 @@
     <div id="app">
       <h1>Battleship</h1>
       
+      <!-- Phase Indicator -->
+      <div id="phase-indicator" class="phase-indicator" role="status" aria-live="polite">
+        <span class="phase-label">Phase:</span>
+        <span id="phase-text" class="phase-text">Setup</span>
+      </div>
+
+      <!-- How to Play Panel (Collapsible) -->
+      <details id="how-to-play" class="how-to-play">
+        <summary>How to Play</summary>
+        <div class="how-to-play-content">
+          <ol>
+            <li><strong>Setup Phase:</strong> Choose manual or random ship placement. Place all 5 ships on your board.</li>
+            <li><strong>Start Game:</strong> Click "Start Game" when your fleet is ready.</li>
+            <li><strong>Your Turn:</strong> Click on the enemy grid to fire. Hits are marked with an explosion, misses with a splash.</li>
+            <li><strong>AI Turn:</strong> The AI will fire back. Watch your fleet!</li>
+            <li><strong>Win:</strong> Sink all 5 enemy ships before they sink yours.</li>
+          </ol>
+          <p><strong>Ships:</strong> Carrier (5), Battleship (4), Cruiser (3), Submarine (3), Destroyer (2)</p>
+        </div>
+      </details>
+
+      <!-- AI Difficulty Selector -->
+      <div id="difficulty-selector" class="difficulty-selector">
+        <label for="difficulty-select">AI Difficulty:</label>
+        <select id="difficulty-select" aria-label="Select AI difficulty level">
+          <option value="easy">Easy - Random shots</option>
+          <option value="normal" selected>Normal - Hunt/Target</option>
+          <option value="hard">Hard - Parity + Hunt/Target</option>
+        </select>
+      </div>
+
       <!-- Placement Mode Selection -->
       <div id="placement-mode-selection">
         <h3>Choose Placement Mode</h3>
         <div class="mode-buttons">
-          <button id="manual-mode-btn" class="icon-btn">
-            <img src="assets/ui/manual.svg" alt="Manual" />
+          <button id="manual-mode-btn" class="icon-btn" aria-label="Manual ship placement">
+            <img src="assets/ui/manual.svg" alt="" aria-hidden="true" />
             <span>Manual Placement</span>
           </button>
-          <button id="random-mode-btn" class="icon-btn">
-            <img src="assets/ui/random.svg" alt="Random" />
+          <button id="random-mode-btn" class="icon-btn" aria-label="Random ship placement">
+            <img src="assets/ui/random.svg" alt="" aria-hidden="true" />
             <span>Random Placement</span>
           </button>
         </div>
@@ -29,13 +60,13 @@
       <!-- Ship Tray for Manual Placement -->
       <div id="ship-tray-container" style="display: none;">
         <h3>Place Your Ships</h3>
-        <div id="ship-tray" class="ship-tray"></div>
+        <div id="ship-tray" class="ship-tray" role="listbox" aria-label="Available ships to place"></div>
         <div id="placement-controls">
-          <button id="rotate-btn" class="icon-btn">
-            <img src="assets/ui/rotate.svg" alt="Rotate" />
+          <button id="rotate-btn" class="icon-btn" aria-label="Rotate ship orientation">
+            <img src="assets/ui/rotate.svg" alt="" aria-hidden="true" />
             <span>Rotate (R)</span>
           </button>
-          <button id="clear-placement-btn">Clear All</button>
+          <button id="clear-placement-btn" aria-label="Clear all placed ships">Clear All</button>
         </div>
         <p id="placement-instructions">Click a ship to select, then click on the board to place. Right-click or press R to rotate.</p>
       </div>
@@ -43,11 +74,39 @@
       <div id="game-container">
         <div id="player-section">
           <h2>Your Fleet</h2>
-          <div id="player-board" class="board"></div>
+          <!-- Axis Labels for Player Board -->
+          <div class="board-wrapper">
+            <div class="column-labels" aria-hidden="true">
+              <span></span>
+              <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span>
+              <span>F</span><span>G</span><span>H</span><span>I</span><span>J</span>
+            </div>
+            <div class="board-with-rows">
+              <div class="row-labels" aria-hidden="true">
+                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+              </div>
+              <div id="player-board" class="board" role="grid" aria-label="Your fleet board"></div>
+            </div>
+          </div>
         </div>
         <div id="enemy-section">
           <h2>Enemy Waters</h2>
-          <div id="enemy-board" class="board"></div>
+          <!-- Axis Labels for Enemy Board -->
+          <div class="board-wrapper">
+            <div class="column-labels" aria-hidden="true">
+              <span></span>
+              <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span>
+              <span>F</span><span>G</span><span>H</span><span>I</span><span>J</span>
+            </div>
+            <div class="board-with-rows">
+              <div class="row-labels" aria-hidden="true">
+                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+              </div>
+              <div id="enemy-board" class="board" role="grid" aria-label="Enemy waters - click to fire"></div>
+            </div>
+          </div>
         </div>
       </div>
       <div id="setup-controls">
@@ -59,7 +118,7 @@
       </div>
       <div id="message-log">
         <h3>Battle Log</h3>
-        <div id="messages"></div>
+        <div id="messages" role="log" aria-live="polite" aria-label="Game events log"></div>
       </div>
     </div>
     <script type="module" src="/src/main.js"></script>

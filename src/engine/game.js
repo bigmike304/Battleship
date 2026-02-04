@@ -1,6 +1,13 @@
 import { Board, GRID_SIZE } from './board.js';
 import { createFleet, resetShipIdCounter, SHIP_TYPES } from './ship.js';
 
+// Convert row/col to classic coordinate format (e.g., "B7")
+function toClassicCoord(row, col) {
+  const colLetter = String.fromCharCode(65 + col); // A-J
+  const rowNumber = row + 1; // 1-10
+  return `${colLetter}${rowNumber}`;
+}
+
 // Placement modes for setup phase
 export const PLACEMENT_MODES = {
   NONE: 'none',
@@ -202,18 +209,19 @@ export class Game {
     }
 
     const result = this.aiBoard.receiveAttack(row, col);
+    const coord = toClassicCoord(row, col);
 
     if (!result.valid) {
-      this.log('You already attacked that cell!', 'system');
+      this.log(`You already attacked ${coord}!`, 'system');
       return null;
     }
 
     if (result.result === 'hit') {
-      this.log(`You hit the enemy's ${result.ship.name}!`, 'player');
+      this.log(`You fired ${coord}: Hit on ${result.ship.name}!`, 'player');
     } else if (result.result === 'sunk') {
-      this.log(`You sunk the enemy's ${result.ship.name}!`, 'player');
+      this.log(`You fired ${coord}: Hit! You sunk AI's ${result.ship.name}!`, 'player');
     } else {
-      this.log('You missed!', 'player');
+      this.log(`You fired ${coord}: Miss`, 'player');
     }
 
     if (this.aiBoard.allShipsSunk()) {
@@ -233,17 +241,18 @@ export class Game {
     }
 
     const result = this.playerBoard.receiveAttack(row, col);
+    const coord = toClassicCoord(row, col);
 
     if (!result.valid) {
       return null;
     }
 
     if (result.result === 'hit') {
-      this.log(`Enemy hit your ${result.ship.name}!`, 'ai');
+      this.log(`AI fired ${coord}: Hit on your ${result.ship.name}!`, 'ai');
     } else if (result.result === 'sunk') {
-      this.log(`Enemy sunk your ${result.ship.name}!`, 'ai');
+      this.log(`AI fired ${coord}: Hit! AI sunk your ${result.ship.name}!`, 'ai');
     } else {
-      this.log('Enemy missed!', 'ai');
+      this.log(`AI fired ${coord}: Miss`, 'ai');
     }
 
     if (this.playerBoard.allShipsSunk()) {

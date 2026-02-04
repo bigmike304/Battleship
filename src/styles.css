@@ -18,6 +18,143 @@ h1 {
   font-size: 2.5rem;
 }
 
+/* Phase Indicator */
+.phase-indicator {
+  text-align: center;
+  margin-bottom: 15px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  display: inline-block;
+  width: 100%;
+}
+
+.phase-label {
+  color: var(--muted);
+  margin-right: 8px;
+}
+
+.phase-text {
+  color: var(--accent);
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.phase-text.setup { color: var(--accent); }
+.phase-text.your-turn { color: var(--success); }
+.phase-text.ai-turn { color: var(--danger); }
+.phase-text.game-over { color: var(--warning, #f0ad4e); }
+
+/* How to Play Panel */
+.how-to-play {
+  margin-bottom: 15px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+}
+
+.how-to-play summary {
+  padding: 12px 20px;
+  cursor: pointer;
+  color: var(--accent);
+  font-weight: bold;
+  user-select: none;
+}
+
+.how-to-play summary:hover {
+  background: rgba(119, 192, 255, 0.1);
+}
+
+.how-to-play-content {
+  padding: 15px 20px;
+  border-top: 1px solid var(--panel-border);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.how-to-play-content ol {
+  margin-left: 20px;
+  margin-bottom: 10px;
+}
+
+.how-to-play-content li {
+  margin-bottom: 8px;
+}
+
+/* AI Difficulty Selector */
+.difficulty-selector {
+  text-align: center;
+  margin-bottom: 15px;
+  padding: 12px 20px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+}
+
+.difficulty-selector label {
+  color: var(--text);
+  margin-right: 10px;
+  font-weight: 500;
+}
+
+.difficulty-selector select {
+  padding: 8px 12px;
+  font-size: 1rem;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.difficulty-selector select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Board Wrapper with Axis Labels */
+.board-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.column-labels {
+  display: grid;
+  grid-template-columns: var(--cell-size) repeat(10, var(--cell-size));
+  gap: var(--cell-gap);
+  margin-bottom: 2px;
+}
+
+.column-labels span {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.board-with-rows {
+  display: flex;
+}
+
+.row-labels {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cell-gap);
+  margin-right: 2px;
+}
+
+.row-labels span {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
 h2 {
   text-align: center;
   margin-bottom: 10px;
@@ -302,6 +439,49 @@ h3 {
   color: var(--danger);
 }
 
+/* Accessibility: Keyboard Focus Styling */
+.cell:focus {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  z-index: 10;
+}
+
+.cell:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Accessibility: Hit/Miss icons for color-blind users */
+.cell.hit::after,
+.cell.miss::after {
+  position: absolute;
+  font-size: 0.6rem;
+  font-weight: bold;
+  bottom: 2px;
+  right: 2px;
+  pointer-events: none;
+}
+
+.cell.hit::after {
+  content: "HIT";
+  color: var(--danger);
+}
+
+.cell.miss::after {
+  content: "MISS";
+  color: var(--accent);
+}
+
+/* Ensure cells are positioned for pseudo-elements */
+.cell {
+  position: relative;
+}
+
 /* Mobile Responsive */
 @media (max-width: 720px) {
   #game-container {
@@ -315,5 +495,31 @@ h3 {
   #ship-tray {
     flex-direction: column;
     align-items: center;
+  }
+  
+  .column-labels {
+    grid-template-columns: 25px repeat(10, var(--cell-size));
+  }
+  
+  .row-labels span {
+    width: 25px;
+    font-size: 0.75rem;
+  }
+  
+  .column-labels span {
+    font-size: 0.75rem;
+  }
+  
+  .difficulty-selector {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .phase-indicator {
+    padding: 8px 15px;
+  }
+  
+  .phase-text {
+    font-size: 1rem;
   }
 }
