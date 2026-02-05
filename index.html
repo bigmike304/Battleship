@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Battleship</title>
-      <!-- Google Fonts: Fraktur for title, Futura-like for UI -->
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
-      <link rel="stylesheet" href="/css/theme.css" />
-      <link rel="stylesheet" href="/src/styles.css" />
-    </head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Battleship</title>
+    <!-- Google Fonts: Fraktur for title, Futura-like for UI -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/theme.css" />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
   <body>
     <div id="app">
       <h1>Battleship</h1>
@@ -21,67 +21,76 @@
         <span id="phase-text" class="phase-text">Setup</span>
       </div>
 
-            <!-- How to Play Panel (Collapsible) -->
-            <details id="how-to-play" class="how-to-play">
-              <summary>How to Play</summary>
-              <div class="how-to-play-content">
-                <ol>
-                  <li><strong>Setup Phase:</strong> Choose manual or random ship placement. Place all 5 ships on your board.</li>
-                  <li><strong>Start Game:</strong> Click "Start Game" when your fleet is ready.</li>
-                  <li><strong>Your Turn:</strong> Click on the enemy grid to fire. Hits are marked with an explosion, misses with a splash.</li>
-                  <li><strong>AI Turn:</strong> The AI will fire back. Watch your fleet!</li>
-                  <li><strong>Win:</strong> Sink all 5 enemy ships before they sink yours.</li>
-                </ol>
-                <p><strong>Ships:</strong> Carrier (5), Battleship (4), Cruiser (3), Submarine (3), Destroyer (2)</p>
-                <h4>Difficulty Levels</h4>
-                <ul class="difficulty-descriptions">
-                  <li><strong>Easy:</strong> AI fires randomly at any available cell.</li>
-                  <li><strong>Normal:</strong> AI uses Hunt/Target logic - after a hit, it targets adjacent cells to sink ships faster.</li>
-                  <li><strong>Hard:</strong> AI uses parity hunting (checkerboard pattern) plus Hunt/Target for maximum efficiency.</li>
-                </ul>
-              </div>
-            </details>
+      <!-- How to Play Panel (Collapsible) -->
+      <details id="how-to-play" class="how-to-play">
+        <summary>How to Play</summary>
+        <div class="how-to-play-content">
+          <ol>
+            <li><strong>Setup Phase:</strong> Choose manual or random ship placement. Place all 5 ships on your board.</li>
+            <li><strong>Start Game:</strong> Click "Start Game" when your fleet is ready.</li>
+            <li><strong>Your Turn:</strong> Click on the enemy grid to fire. Hits are marked with an explosion, misses with a splash.</li>
+            <li><strong>AI Turn:</strong> The AI will fire back. Watch your fleet!</li>
+            <li><strong>Win:</strong> Sink all 5 enemy ships before they sink yours.</li>
+          </ol>
+          <p><strong>Ships:</strong> Carrier (5), Battleship (4), Cruiser (3), Submarine (3), Destroyer (2)</p>
+          <h4>Difficulty Levels</h4>
+          <ul class="difficulty-descriptions">
+            <li><strong>Easy:</strong> AI fires randomly at any available cell.</li>
+            <li><strong>Normal:</strong> AI uses Hunt/Target logic - after a hit, it targets adjacent cells to sink ships faster.</li>
+            <li><strong>Hard:</strong> AI uses parity hunting (checkerboard pattern) plus Hunt/Target for maximum efficiency.</li>
+          </ul>
+        </div>
+      </details>
 
-            <!-- Player Name Input -->
-            <div id="player-name-section" class="player-name-section">
-              <label for="player-name-input">Player Name:</label>
-              <input type="text" id="player-name-input" placeholder="Enter your name" maxlength="20" />
-            </div>
+      <!-- Player Name Input -->
+      <div id="player-name-section" class="player-name-section">
+        <label for="player-name-input">Player Name:</label>
+        <input type="text" id="player-name-input" placeholder="Enter your name" maxlength="20" />
+      </div>
 
-            <!-- AI Difficulty Selector -->
-            <div id="difficulty-selector" class="difficulty-selector">
-              <label for="difficulty-select">AI Difficulty:</label>
-              <select id="difficulty-select" aria-label="Select AI difficulty level">
-                <option value="easy">Easy - Random shots</option>
-                <option value="normal" selected>Normal - Hunt/Target</option>
-                <option value="hard">Hard - Parity + Hunt/Target</option>
-              </select>
-            </div>
+      <!-- AI Difficulty Selector -->
+      <div id="difficulty-selector" class="difficulty-selector">
+        <label for="difficulty-select">AI Difficulty:</label>
+        <select id="difficulty-select" aria-label="Select AI difficulty level">
+          <option value="easy">Easy - Random shots</option>
+          <option value="normal" selected>Normal - Hunt/Target</option>
+          <option value="hard">Hard - Parity + Hunt/Target</option>
+        </select>
+      </div>
 
-            <!-- Sound Toggle -->
-            <div id="sound-toggle-section" class="sound-toggle-section">
-              <label for="sound-toggle">Sound:</label>
-              <button id="sound-toggle" class="sound-toggle-btn" aria-label="Toggle sound effects">On</button>
-            </div>
+      <!-- Sound Toggle -->
+      <div id="sound-toggle-section" class="sound-toggle-section">
+        <label for="sound-toggle">Sound:</label>
+        <button id="sound-toggle" class="sound-toggle-btn" aria-label="Toggle sound effects">On</button>
+      </div>
 
-            <!-- Shot Counter -->
-            <div id="shot-counter" class="shot-counter" style="display: none;">
-              <span class="shot-label">Shots:</span>
-              <span id="shot-count" class="shot-count">0</span>
-            </div>
+      <!-- Shot Counter -->
+      <div id="shot-counter" class="shot-counter" style="display: none;">
+        <span class="shot-label">Shots:</span>
+        <span id="shot-count" class="shot-count">0</span>
+      </div>
 
-      <!-- Placement Mode Selection -->
-      <div id="placement-mode-selection">
-        <h3>Choose Placement Mode</h3>
-        <div class="mode-buttons">
-          <button id="manual-mode-btn" class="icon-btn" aria-label="Manual ship placement">
-            <img src="/assets/ui/manual.svg" alt="" aria-hidden="true" />
-            <span>Manual Placement</span>
-          </button>
-          <button id="random-mode-btn" class="icon-btn" aria-label="Random ship placement">
-            <img src="/assets/ui/random.svg" alt="" aria-hidden="true" />
-            <span>Random Placement</span>
-          </button>
+      <!-- Setup Controls Container: Placement Mode + Action Buttons -->
+      <div id="setup-controls-container" class="setup-controls-container">
+        <!-- Placement Mode Selection -->
+        <div id="placement-mode-selection">
+          <h3>Choose Placement Mode</h3>
+          <div class="mode-buttons">
+            <button id="manual-mode-btn" class="icon-btn" aria-label="Manual ship placement">
+              <img src="/assets/ui/manual.svg" alt="" aria-hidden="true" />
+              <span>Manual Placement</span>
+            </button>
+            <button id="random-mode-btn" class="icon-btn" aria-label="Random ship placement">
+              <img src="/assets/ui/random.svg" alt="" aria-hidden="true" />
+              <span>Random Placement</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Setup Action Controls (directly under placement mode) -->
+        <div id="setup-controls">
+          <button id="randomize-btn" style="display: none;">Randomize My Ships</button>
+          <button id="start-btn">Start Game</button>
         </div>
       </div>
 
@@ -100,10 +109,10 @@
         <p id="placement-instructions">Click a ship to select, then click on the board to place. Right-click or press R to rotate.</p>
       </div>
 
+      <!-- Game Boards -->
       <div id="game-container">
         <div id="player-section">
           <h2>Your Fleet</h2>
-          <!-- Axis Labels for Player Board -->
           <div class="board-wrapper">
             <div class="column-labels" aria-hidden="true">
               <span></span>
@@ -121,7 +130,6 @@
         </div>
         <div id="enemy-section">
           <h2>Enemy Waters</h2>
-          <!-- Axis Labels for Enemy Board -->
           <div class="board-wrapper">
             <div class="column-labels" aria-hidden="true">
               <span></span>
@@ -138,27 +146,27 @@
           </div>
         </div>
       </div>
-      <div id="setup-controls">
-        <button id="randomize-btn" style="display: none;">Randomize My Ships</button>
-        <button id="start-btn">Start Game</button>
-      </div>
+
+      <!-- Game Controls (shown during gameplay) -->
       <div id="game-controls">
         <button id="restart-btn">Restart Game</button>
       </div>
-          <div id="message-log">
-            <h3>Battle Log</h3>
-            <div id="messages" role="log" aria-live="polite" aria-label="Game events log"></div>
-          </div>
 
-          <!-- Leaderboard Panel -->
-          <div id="leaderboard-panel" class="leaderboard-panel">
-            <h3>Leaderboard</h3>
-            <div id="leaderboard-list" class="leaderboard-list">
-              <p class="leaderboard-empty">No scores yet. Win a game to get on the board!</p>
-            </div>
-            <button id="clear-leaderboard-btn" class="clear-leaderboard-btn">Clear Leaderboard</button>
-          </div>
+      <!-- Battle Log -->
+      <div id="message-log">
+        <h3>Battle Log</h3>
+        <div id="messages" role="log" aria-live="polite" aria-label="Game events log"></div>
+      </div>
+
+      <!-- Leaderboard Panel -->
+      <div id="leaderboard-panel" class="leaderboard-panel">
+        <h3>Leaderboard</h3>
+        <div id="leaderboard-list" class="leaderboard-list">
+          <p class="leaderboard-empty">No scores yet. Win a game to get on the board!</p>
         </div>
+        <button id="clear-leaderboard-btn" class="clear-leaderboard-btn">Clear Leaderboard</button>
+      </div>
+    </div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
