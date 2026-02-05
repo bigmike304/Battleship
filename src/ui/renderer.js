@@ -111,9 +111,9 @@ export class Renderer {
         pieceEl.classList.add('selected');
       }
       
-      // Ship image
+      // Ship image - use BASE_URL for correct path in production
       const imgEl = document.createElement('img');
-      imgEl.src = `assets/ships/${SHIP_ASSET_MAP[ship.name]}`;
+      imgEl.src = `${import.meta.env.BASE_URL}assets/ships/${SHIP_ASSET_MAP[ship.name]}`;
       imgEl.alt = ship.name;
       
       // Ship info

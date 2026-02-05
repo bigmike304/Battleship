@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { Game, GAME_STATES } from '../src/engine/game.js';
+import { Game, GAME_STATES, PLACEMENT_MODES } from '../src/engine/game.js';
 import { Board, CELL_STATES } from '../src/engine/board.js';
 import { createShip, resetShipIdCounter } from '../src/engine/ship.js';
 
@@ -270,5 +270,212 @@ describe('Board win detection edge cases', () => {
     expect(ship2.hits.size).toBe(1);
     expect(ship3.hits.size).toBe(1);
     expect(board.allShipsSunk()).toBe(false);
+  });
+});
+
+describe('Placement mode transitions', () => {
+  let game;
+
+  beforeEach(() => {
+    resetShipIdCounter();
+    game = new Game();
+    game.initialize();
+  });
+
+  describe('setPlacementMode', () => {
+    it('should set placement mode to MANUAL', () => {
+      const result = game.setPlacementMode(PLACEMENT_MODES.MANUAL);
+      expect(result).toBe(true);
+      expect(game.placementMode).toBe(PLACEMENT_MODES.MANUAL);
+    });
+
+    it('should set placement mode to RANDOM', () => {
+      const result = game.setPlacementMode(PLACEMENT_MODES.RANDOM);
+      expect(result).toBe(true);
+      expect(game.placementMode).toBe(PLACEMENT_MODES.RANDOM);
+    });
+
+    it('should create fleet when setting MANUAL mode', () => {
+      game.setPlacementMode(PLACEMENT_MODES.MANUAL);
+      expect(game.playerFleet.length).toBe(5);
+      expect(game.placedShips.size).toBe(0);
+    });
+
+    it('should return false when not in SETUP_PLAYER state', () => {
+      game.state = GAME_STATES.PLAYER_TURN;
+      const result = game.setPlacementMode(PLACEMENT_MODES.MANUAL);
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('resetPlacementMode', () => {
+    it('should reset placement mode from MANUAL to NONE', () => {
+      game.setPlacementMode(PLACEMENT_MODES.MANUAL);
+      expect(game.placementMode).toBe(PLACEMENT_MODES.MANUAL);
+      
+      const result = game.resetPlacementMode();
+      expect(result).toBe(true);
+      expect(game.placementMode).toBe(PLACEMENT_MODES.NONE);
+    });
+
+    it('should reset placement mode from RANDOM to NONE', () => {
+      game.setPlacementMode(PLACEMENT_MODES.RANDOM);
+      expect(game.placementMode).toBe(PLACEMENT_MODES.RANDOM);
+      
+      const result = game.resetPlacementMode();
+      expect(result).toBe(true);
+      expect(game.placementMode).toBe(PLACEMENT_MODES.NONE);
+    });
+
+    it('should clear player board when resetting from MANUAL mode', () => {
+      game.setPlacementMode(PLACEMENT_MODES.MANUAL);
+      const ship = game.playerFleet[0];
+      game.placePlayerShip(ship, 0, 0, true);
+      expect(game.playerBoard.ships.length).toBe(1);
+      
+      game.resetPlacementMode();
+      expect(game.playerBoard.ships.length).toBe(0);
+    });
+
+    it('should clear player board when resetting from RANDOM mode', () => {
+      game.setPlacementMode(PLACEMENT_MODES.RANDOM);
+      game.randomizePlayerShips();
+      expect(game.playerBoard.ships.length).toBe(5);
+      
+      game.resetPlacementMode();
+      expect(game.playerBoard.ships.length).toBe(0);
+    });
+
+    it('should clear placed ships set when resetting', () => {
+      game.setPlacementMode(PLACEMENT_MODES.MANUAL);
+      const ship = game.playerFleet[0];
+      game.placePlayerShip(ship, 0, 0, true);
+      expect(game.placedShips.size).toBe(1);
+      
+      game.resetPlacementMode();
+      expect(game.placedShips.size).toBe(0);
+    });
+
+    it('should clear player fleet when resetting', () => {
+      game.setPlacementMode(PLACEMENT_MODES.MANUAL);
+      expect(game.playerFleet.length).toBe(5);
+      
+      game.resetPlacementMode();
+      expect(game.playerFleet.length).toBe(0);
+    });
+
+    it('should return false when not in SETUP_PLAYER state', () => {
+      game.setPlacementMode(PLACEMENT_MODES.MANUAL);
+      game.state = GAME_STATES.PLAYER_TURN;
+      
+      const result = game.resetPlacementMode();
+      expect(result).toBe(false);
+    });
+
+    it('should allow switching from MANUAL to RANDOM mode', () => {
+      game.setPlacementMode(PLACEMENT_MODES.MANUAL);
+      const ship = game.playerFleet[0];
+      game.placePlayerShip(ship, 0, 0, true);
+      
+      game.resetPlacementMode();
+      game.setPlacementMode(PLACEMENT_MODES.RANDOM);
+      
+      expect(game.placementMode).toBe(PLACEMENT_MODES.RANDOM);
+      expect(game.playerBoard.ships.length).toBe(0);
+    });
+
+    it('should allow switching from RANDOM to MANUAL mode', () => {
+      game.setPlacementMode(PLACEMENT_MODES.RANDOM);
+      game.randomizePlayerShips();
+      
+      game.resetPlacementMode();
+      game.setPlacementMode(PLACEMENT_MODES.MANUAL);
+      
+      expect(game.placementMode).toBe(PLACEMENT_MODES.MANUAL);
+      expect(game.playerBoard.ships.length).toBe(0);
+      expect(game.playerFleet.length).toBe(5);
+    });
+  });
+
+  describe('startGame restrictions', () => {
+    it('should not allow starting game when placement mode is NONE', () => {
+      expect(game.placementMode).toBe(PLACEMENT_MODES.NONE);
+      const result = game.startGame();
+      expect(result).toBe(false);
+    });
+
+    it('should not allow starting game in MANUAL mode without all ships placed', () => {
+      game.setPlacementMode(PLACEMENT_MODES.MANUAL);
+      const ship = game.playerFleet[0];
+      game.placePlayerShip(ship, 0, 0, true);
+      
+      const result = game.startGame();
+      expect(result).toBe(false);
+    });
+
+    it('should allow starting game in MANUAL mode with all ships placed', () => {
+      game.setPlacementMode(PLACEMENT_MODES.MANUAL);
+      
+      // Place all ships
+      let row = 0;
+      for (const ship of game.playerFleet) {
+        game.placePlayerShip(ship, row, 0, true);
+        row += 2;
+      }
+      
+      const result = game.startGame();
+      expect(result).toBe(true);
+      expect(game.state).toBe(GAME_STATES.PLAYER_TURN);
+    });
+
+    it('should not allow starting game in RANDOM mode without ships', () => {
+      game.setPlacementMode(PLACEMENT_MODES.RANDOM);
+      const result = game.startGame();
+      expect(result).toBe(false);
+    });
+
+    it('should allow starting game in RANDOM mode after randomizing', () => {
+      game.setPlacementMode(PLACEMENT_MODES.RANDOM);
+      game.randomizePlayerShips();
+      
+      const result = game.startGame();
+      expect(result).toBe(true);
+      expect(game.state).toBe(GAME_STATES.PLAYER_TURN);
+    });
+  });
+
+  describe('restart clears all state', () => {
+    it('should reset placement mode to NONE on restart', () => {
+      game.setPlacementMode(PLACEMENT_MODES.MANUAL);
+      game.restart();
+      expect(game.placementMode).toBe(PLACEMENT_MODES.NONE);
+    });
+
+    it('should clear player fleet on restart', () => {
+      game.setPlacementMode(PLACEMENT_MODES.MANUAL);
+      expect(game.playerFleet.length).toBe(5);
+      
+      game.restart();
+      expect(game.playerFleet.length).toBe(0);
+    });
+
+    it('should clear placed ships on restart', () => {
+      game.setPlacementMode(PLACEMENT_MODES.MANUAL);
+      const ship = game.playerFleet[0];
+      game.placePlayerShip(ship, 0, 0, true);
+      
+      game.restart();
+      expect(game.placedShips.size).toBe(0);
+    });
+
+    it('should return to SETUP_PLAYER state on restart from any state', () => {
+      game.setPlacementMode(PLACEMENT_MODES.RANDOM);
+      game.randomizePlayerShips();
+      game.startGame();
+      expect(game.state).toBe(GAME_STATES.PLAYER_TURN);
+      
+      game.restart();
+      expect(game.state).toBe(GAME_STATES.SETUP_PLAYER);
+    });
   });
 });

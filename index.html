@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Battleship</title>
-    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="/css/theme.css" />
     <link rel="stylesheet" href="/src/styles.css" />
   </head>
   <body>
@@ -47,11 +47,11 @@
         <h3>Choose Placement Mode</h3>
         <div class="mode-buttons">
           <button id="manual-mode-btn" class="icon-btn" aria-label="Manual ship placement">
-            <img src="assets/ui/manual.svg" alt="" aria-hidden="true" />
+            <img src="/assets/ui/manual.svg" alt="" aria-hidden="true" />
             <span>Manual Placement</span>
           </button>
           <button id="random-mode-btn" class="icon-btn" aria-label="Random ship placement">
-            <img src="assets/ui/random.svg" alt="" aria-hidden="true" />
+            <img src="/assets/ui/random.svg" alt="" aria-hidden="true" />
             <span>Random Placement</span>
           </button>
         </div>
@@ -63,10 +63,11 @@
         <div id="ship-tray" class="ship-tray" role="listbox" aria-label="Available ships to place"></div>
         <div id="placement-controls">
           <button id="rotate-btn" class="icon-btn" aria-label="Rotate ship orientation">
-            <img src="assets/ui/rotate.svg" alt="" aria-hidden="true" />
+            <img src="/assets/ui/rotate.svg" alt="" aria-hidden="true" />
             <span>Rotate (R)</span>
           </button>
           <button id="clear-placement-btn" aria-label="Clear all placed ships">Clear All</button>
+          <button id="change-mode-btn" class="change-mode-btn" aria-label="Change placement mode">Change Mode</button>
         </div>
         <p id="placement-instructions">Click a ship to select, then click on the board to place. Right-click or press R to rotate.</p>
       </div>
