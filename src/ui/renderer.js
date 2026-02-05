@@ -232,29 +232,33 @@ export class Renderer {
   }
 
   updateControlsVisibility(state, placementMode = null) {
+    const setupSection = document.getElementById('setup-section');
     const placementModeSelection = document.getElementById('placement-mode-selection');
     const shipTrayContainer = document.getElementById('ship-tray-container');
     const setupControls = document.getElementById('setup-controls');
     const gameControls = document.getElementById('game-controls');
     const randomizeBtn = document.getElementById('randomize-btn');
     const startBtn = document.getElementById('start-btn');
-    const difficultySelector = document.getElementById('difficulty-selector');
 
     if (state === GAME_STATES.SETUP_PLAYER) {
+      // Show entire setup section during setup
+      setupSection.style.display = 'block';
       gameControls.style.display = 'none';
-      difficultySelector.style.display = 'block';
+      
+      // Setup controls (Randomize + Start) are ALWAYS visible during setup
+      setupControls.style.display = 'flex';
       
       if (placementMode === PLACEMENT_MODES.NONE || !placementMode) {
-        // Show mode selection, hide everything else
+        // Initial state: show mode selection, buttons visible but Start disabled
         placementModeSelection.style.display = 'block';
         shipTrayContainer.style.display = 'none';
-        setupControls.style.display = 'none';
+        randomizeBtn.style.display = 'block';
+        startBtn.disabled = true;
         this.setPlacementMode(false);
       } else if (placementMode === PLACEMENT_MODES.MANUAL) {
         // Manual placement mode
         placementModeSelection.style.display = 'none';
         shipTrayContainer.style.display = 'block';
-        setupControls.style.display = 'flex';
         randomizeBtn.style.display = 'none';
         startBtn.disabled = !this.game.allShipsPlaced();
         this.setPlacementMode(true);
@@ -262,18 +266,15 @@ export class Renderer {
         // Random placement mode
         placementModeSelection.style.display = 'none';
         shipTrayContainer.style.display = 'none';
-        setupControls.style.display = 'flex';
         randomizeBtn.style.display = 'block';
         startBtn.disabled = this.game.playerBoard.ships.length === 0;
         this.setPlacementMode(false);
       }
     } else {
-      // Game in progress or game over
-      placementModeSelection.style.display = 'none';
+      // Game in progress or game over - hide setup section entirely
+      setupSection.style.display = 'none';
       shipTrayContainer.style.display = 'none';
-      setupControls.style.display = 'none';
       gameControls.style.display = 'block';
-      difficultySelector.style.display = 'none';
       this.setPlacementMode(false);
     }
     
