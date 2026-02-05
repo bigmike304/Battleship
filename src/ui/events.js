@@ -38,6 +38,7 @@ export class EventHandler {
   setupPlacementModeHandlers() {
     const manualModeBtn = document.getElementById('manual-mode-btn');
     const randomModeBtn = document.getElementById('random-mode-btn');
+    const changeModeBtn = document.getElementById('change-mode-btn');
 
     manualModeBtn.addEventListener('click', () => {
       this.game.setPlacementMode(PLACEMENT_MODES.MANUAL);
@@ -47,6 +48,16 @@ export class EventHandler {
 
     randomModeBtn.addEventListener('click', () => {
       this.game.setPlacementMode(PLACEMENT_MODES.RANDOM);
+      this.renderer.updateControlsVisibility(this.game.state, this.game.placementMode);
+    });
+
+    // Handle changing placement mode (return to mode selection)
+    changeModeBtn.addEventListener('click', () => {
+      this.game.resetPlacementMode();
+      this.selectedShip = null;
+      this.isHorizontal = true;
+      this.renderer.clearPlacementPreview();
+      this.renderer.renderBoards();
       this.renderer.updateControlsVisibility(this.game.state, this.game.placementMode);
     });
   }

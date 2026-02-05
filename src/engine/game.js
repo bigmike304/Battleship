@@ -70,6 +70,28 @@ export class Game {
     return true;
   }
 
+  // Reset placement mode to allow switching between manual and random
+  resetPlacementMode() {
+    if (this.state !== GAME_STATES.SETUP_PLAYER) {
+      return false;
+    }
+    
+    // Clear player board
+    this.playerBoard.reset();
+    
+    // Reset placement tracking
+    this.placementMode = PLACEMENT_MODES.NONE;
+    this.playerFleet = [];
+    this.placedShips = new Set();
+    
+    // Reset ship ID counter for fresh fleet creation
+    resetShipIdCounter();
+    
+    this.log('Placement mode reset. Choose a new placement mode.', 'system');
+    this.triggerUpdate();
+    return true;
+  }
+
   // Get ships available for manual placement
   getAvailableShips() {
     return this.playerFleet.filter(ship => !this.placedShips.has(ship.id));

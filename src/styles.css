@@ -261,52 +261,53 @@ h3 {
 }
 
 /* Ship sprites on cells - per ship type */
+/* Ship on top (first), water below (second) - CSS stacking order */
 .cell.ship--carrier {
-  background-image: url("../assets/tiles/water.svg"), url("../assets/ships/carrier.svg");
-  background-size: cover, 90% 90%;
+  background-image: url("/assets/ships/carrier.svg"), url("/assets/tiles/water.svg");
+  background-size: 90% 90%, cover;
   background-repeat: no-repeat, no-repeat;
   background-position: center, center;
 }
 
 .cell.ship--battleship {
-  background-image: url("../assets/tiles/water.svg"), url("../assets/ships/battleship.svg");
-  background-size: cover, 90% 90%;
+  background-image: url("/assets/ships/battleship.svg"), url("/assets/tiles/water.svg");
+  background-size: 90% 90%, cover;
   background-repeat: no-repeat, no-repeat;
   background-position: center, center;
 }
 
 .cell.ship--cruiser {
-  background-image: url("../assets/tiles/water.svg"), url("../assets/ships/cruiser.svg");
-  background-size: cover, 90% 90%;
+  background-image: url("/assets/ships/cruiser.svg"), url("/assets/tiles/water.svg");
+  background-size: 90% 90%, cover;
   background-repeat: no-repeat, no-repeat;
   background-position: center, center;
 }
 
 .cell.ship--submarine {
-  background-image: url("../assets/tiles/water.svg"), url("../assets/ships/submarine.svg");
-  background-size: cover, 90% 90%;
+  background-image: url("/assets/ships/submarine.svg"), url("/assets/tiles/water.svg");
+  background-size: 90% 90%, cover;
   background-repeat: no-repeat, no-repeat;
   background-position: center, center;
 }
 
 .cell.ship--destroyer {
-  background-image: url("../assets/tiles/water.svg"), url("../assets/ships/destroyer.svg");
-  background-size: cover, 90% 90%;
+  background-image: url("/assets/ships/destroyer.svg"), url("/assets/tiles/water.svg");
+  background-size: 90% 90%, cover;
   background-repeat: no-repeat, no-repeat;
   background-position: center, center;
 }
 
 /* Generic ship class for backwards compatibility */
 .cell.ship:not([class*="ship--"]) {
-  background-image: url("../assets/tiles/water.svg"), url("../assets/ships/destroyer.svg");
-  background-size: cover, 90% 90%;
+  background-image: url("/assets/ships/destroyer.svg"), url("/assets/tiles/water.svg");
+  background-size: 90% 90%, cover;
   background-repeat: no-repeat, no-repeat;
   background-position: center, center;
 }
 
 /* Placement preview */
 .cell.placement-preview {
-  background-image: url("../assets/tiles/water_hover.svg");
+  background-image: url("/assets/tiles/water_hover.svg");
   opacity: 0.7;
 }
 

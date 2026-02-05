@@ -55,7 +55,7 @@ button:active{ transform: translateY(1px); }
   width: var(--cell-size);
   height: var(--cell-size);
   border-radius: 10px;
-  background-image: url("../assets/tiles/water.svg");
+  background-image: url("/Battleship/assets/tiles/water.svg");
   background-size: cover;
   background-position: center;
   position: relative;
@@ -63,15 +63,15 @@ button:active{ transform: translateY(1px); }
 }
 
 .cell:hover{
-  background-image: url("../assets/tiles/water_hover.svg");
+  background-image: url("/Battleship/assets/tiles/water_hover.svg");
 }
 
 .cell.ship{
-  /* ship image applied per-ship via inline style or data-attr */
+  /* Ship on top (first), water below (second) - CSS stacking order */
   background-image:
-    url("../assets/tiles/water.svg"),
-    url("../assets/ships/destroyer.svg");
-  background-size: cover, 90% 90%;
+    url("/Battleship/assets/ships/destroyer.svg"),
+    url("/Battleship/assets/tiles/water.svg");
+  background-size: 90% 90%, cover;
   background-repeat: no-repeat, no-repeat;
   background-position: center, center;
 }
@@ -79,13 +79,13 @@ button:active{ transform: translateY(1px); }
 .cell.hit::after{
   content:"";
   position:absolute; inset: 0;
-  background: url("../assets/markers/hit.svg") center/90% no-repeat;
+  background: url("/Battleship/assets/markers/hit.svg") center/90% no-repeat;
 }
 
 .cell.miss::after{
   content:"";
   position:absolute; inset: 0;
-  background: url("../assets/markers/miss.svg") center/90% no-repeat;
+  background: url("/Battleship/assets/markers/miss.svg") center/90% no-repeat;
 }
 
 /* Ship tray (manual placement) */
