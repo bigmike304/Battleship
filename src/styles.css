@@ -815,4 +815,46 @@ button:focus-visible {
     padding: 6px 8px;
     font-size: 0.8rem;
   }
+
+  .app-footer {
+    padding: 15px;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* Footer Styles */
+.app-footer {
+  margin-top: 30px;
+  padding: 20px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.footer-text {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.footer-sound-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-sound-toggle label {
+  color: var(--text);
+  font-weight: 500;
 }

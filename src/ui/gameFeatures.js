@@ -108,25 +108,39 @@ export class GameFeatures {
   }
 
   setupSoundToggle() {
-    const toggleBtn = document.getElementById('sound-toggle');
-    if (!toggleBtn) return;
+    const setupToggleBtn = document.getElementById('sound-toggle');
+    const footerToggleBtn = document.getElementById('footer-sound-toggle');
 
     this.updateSoundToggleUI();
 
-    toggleBtn.addEventListener('click', () => {
+    const handleToggle = () => {
       this.soundEnabled = !this.soundEnabled;
       this.saveSoundPreference();
       this.updateSoundToggleUI();
-    });
+    };
+
+    if (setupToggleBtn) {
+      setupToggleBtn.addEventListener('click', handleToggle);
+    }
+    if (footerToggleBtn) {
+      footerToggleBtn.addEventListener('click', handleToggle);
+    }
   }
 
   updateSoundToggleUI() {
-    const toggleBtn = document.getElementById('sound-toggle');
-    if (!toggleBtn) return;
+    const setupToggleBtn = document.getElementById('sound-toggle');
+    const footerToggleBtn = document.getElementById('footer-sound-toggle');
+    const label = this.soundEnabled ? 'On' : 'Off';
+    const addClass = this.soundEnabled ? 'sound-on' : 'sound-off';
+    const removeClass = this.soundEnabled ? 'sound-off' : 'sound-on';
 
-    toggleBtn.textContent = this.soundEnabled ? 'On' : 'Off';
-    toggleBtn.classList.remove('sound-on', 'sound-off');
-    toggleBtn.classList.add(this.soundEnabled ? 'sound-on' : 'sound-off');
+    [setupToggleBtn, footerToggleBtn].forEach(btn => {
+      if (btn) {
+        btn.textContent = label;
+        btn.classList.remove(removeClass);
+        btn.classList.add(addClass);
+      }
+    });
   }
 
   setupClearLeaderboard() {
