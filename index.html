@@ -42,38 +42,10 @@
         </div>
       </details>
 
-      <!-- Player Name Input -->
-      <div id="player-name-section" class="player-name-section">
-        <label for="player-name-input">Player Name:</label>
-        <input type="text" id="player-name-input" placeholder="Enter your name" maxlength="20" />
-      </div>
-
-      <!-- AI Difficulty Selector -->
-      <div id="difficulty-selector" class="difficulty-selector">
-        <label for="difficulty-select">AI Difficulty:</label>
-        <select id="difficulty-select" aria-label="Select AI difficulty level">
-          <option value="easy">Easy - Random shots</option>
-          <option value="normal" selected>Normal - Hunt/Target</option>
-          <option value="hard">Hard - Parity + Hunt/Target</option>
-        </select>
-      </div>
-
-      <!-- Sound Toggle -->
-      <div id="sound-toggle-section" class="sound-toggle-section">
-        <label for="sound-toggle">Sound:</label>
-        <button id="sound-toggle" class="sound-toggle-btn" aria-label="Toggle sound effects">On</button>
-      </div>
-
-      <!-- Shot Counter -->
-      <div id="shot-counter" class="shot-counter" style="display: none;">
-        <span class="shot-label">Shots:</span>
-        <span id="shot-count" class="shot-count">0</span>
-      </div>
-
-      <!-- Setup Controls Container: Placement Mode + Action Buttons -->
-      <div id="setup-controls-container" class="setup-controls-container">
+      <!-- Setup Section - ALL setup controls grouped together at top -->
+      <section id="setup-section" class="setup-section">
         <!-- Placement Mode Selection -->
-        <div id="placement-mode-selection">
+        <div id="placement-mode-selection" class="placement-mode-selection">
           <h3>Choose Placement Mode</h3>
           <div class="mode-buttons">
             <button id="manual-mode-btn" class="icon-btn" aria-label="Manual ship placement">
@@ -87,15 +59,45 @@
           </div>
         </div>
 
-        <!-- Setup Action Controls (directly under placement mode) -->
-        <div id="setup-controls">
-          <button id="randomize-btn" style="display: none;">Randomize My Ships</button>
-          <button id="start-btn">Start Game</button>
+        <!-- Setup Action Buttons (directly under placement mode) -->
+        <div id="setup-controls" class="setup-controls">
+          <button id="randomize-btn">Randomize My Ships</button>
+          <button id="start-btn" disabled>Start Game</button>
         </div>
+
+        <!-- AI Difficulty Selector -->
+        <div id="difficulty-selector" class="difficulty-selector">
+          <label for="difficulty-select">AI Difficulty:</label>
+          <select id="difficulty-select" aria-label="Select AI difficulty level">
+            <option value="easy">Easy - Random shots</option>
+            <option value="normal" selected>Normal - Hunt/Target</option>
+            <option value="hard">Hard - Parity + Hunt/Target</option>
+          </select>
+        </div>
+
+        <!-- Sound Toggle -->
+        <div id="sound-toggle-section" class="sound-toggle-section">
+          <label for="sound-toggle">Sound:</label>
+          <button id="sound-toggle" class="sound-toggle-btn" aria-label="Toggle sound effects">On</button>
+        </div>
+
+        <!-- Player Name Input with Save Button -->
+        <div id="player-name-section" class="player-name-section">
+          <label for="player-name-input">Player Name:</label>
+          <input type="text" id="player-name-input" placeholder="Enter your name" maxlength="20" />
+          <button id="save-name-btn" class="save-name-btn">Save Name</button>
+          <span id="name-save-status" class="name-save-status"></span>
+        </div>
+      </section>
+
+      <!-- Shot Counter (shown during gameplay) -->
+      <div id="shot-counter" class="shot-counter" style="display: none;">
+        <span class="shot-label">Shots:</span>
+        <span id="shot-count" class="shot-count">0</span>
       </div>
 
       <!-- Ship Tray for Manual Placement -->
-      <div id="ship-tray-container" style="display: none;">
+      <div id="ship-tray-container" class="ship-tray-container" style="display: none;">
         <h3>Place Your Ships</h3>
         <div id="ship-tray" class="ship-tray" role="listbox" aria-label="Available ships to place"></div>
         <div id="placement-controls">
@@ -148,7 +150,7 @@
       </div>
 
       <!-- Game Controls (shown during gameplay) -->
-      <div id="game-controls">
+      <div id="game-controls" style="display: none;">
         <button id="restart-btn">Restart Game</button>
       </div>
 

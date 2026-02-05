@@ -20,6 +20,7 @@ export class GameFeatures {
 
   initializeUI() {
     this.setupPlayerNameInput();
+    this.setupSaveNameButton();
     this.setupSoundToggle();
     this.setupClearLeaderboard();
     this.setupUserInteractionListener();
@@ -60,13 +61,50 @@ export class GameFeatures {
     const input = document.getElementById('player-name-input');
     if (!input) return;
 
-    input.addEventListener('input', () => {
-      this.savePlayerName(input.value);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        this.handleSaveName();
+      }
     });
+  }
 
-    input.addEventListener('blur', () => {
-      this.savePlayerName(input.value);
+  setupSaveNameButton() {
+    const saveBtn = document.getElementById('save-name-btn');
+    if (!saveBtn) return;
+
+    saveBtn.addEventListener('click', () => {
+      this.handleSaveName();
     });
+  }
+
+  handleSaveName() {
+    const input = document.getElementById('player-name-input');
+    const statusEl = document.getElementById('name-save-status');
+    if (!input) return;
+
+    const name = input.value.trim();
+    
+    if (!name) {
+      this.showNameStatus('Please enter a name', 'error');
+      return false;
+    }
+
+    this.savePlayerName(name);
+    this.showNameStatus('Name saved!', 'success');
+    return true;
+  }
+
+  showNameStatus(message, type) {
+    const statusEl = document.getElementById('name-save-status');
+    if (!statusEl) return;
+
+    statusEl.textContent = message;
+    statusEl.className = `name-save-status ${type}`;
+    
+    setTimeout(() => {
+      statusEl.textContent = '';
+      statusEl.className = 'name-save-status';
+    }, 3000);
   }
 
   setupSoundToggle() {
@@ -277,13 +315,28 @@ export class GameFeatures {
     }
 
     if (!playerName) {
-      this.showScoreSaveMessage('Enter a name to save your score.', 'error');
+      this.showScoreSaveMessage('Save your name to record your score.', 'error');
+      this.highlightNameInput();
       return false;
     }
 
     this.addLeaderboardEntry(playerName, this.shotCount, difficulty);
     this.showScoreSaveMessage(`Score saved! ${this.shotCount} shots on ${this.capitalizeFirst(difficulty)}.`, 'success');
     return true;
+  }
+
+  highlightNameInput() {
+    const nameSection = document.getElementById('player-name-section');
+    const input = document.getElementById('player-name-input');
+    if (nameSection) {
+      nameSection.classList.add('highlight-warning');
+      setTimeout(() => {
+        nameSection.classList.remove('highlight-warning');
+      }, 5000);
+    }
+    if (input) {
+      input.focus();
+    }
   }
 
   showScoreSaveMessage(message, type) {
