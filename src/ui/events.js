@@ -2,15 +2,19 @@ import { GAME_STATES, PLACEMENT_MODES } from '../engine/game.js';
 import { AI_DIFFICULTY } from '../ai/aiCore.js';
 
 export class EventHandler {
-  constructor(game, ai, renderer) {
+  constructor(game, ai, renderer, gameFeatures) {
     this.game = game;
     this.ai = ai;
     this.renderer = renderer;
+    this.gameFeatures = gameFeatures;
     this.aiTurnDelay = 800;
     
     // Manual placement state
     this.selectedShip = null;
     this.isHorizontal = true;
+    
+    // Track current difficulty
+    this.currentDifficulty = 'normal';
   }
 
   initialize() {
@@ -24,17 +28,16 @@ export class EventHandler {
     this.setupKeyboardHandlers();
   }
 
-  // Handle AI difficulty selection
   setupDifficultyHandler() {
     const difficultySelect = document.getElementById('difficulty-select');
     
     difficultySelect.addEventListener('change', (e) => {
       const difficulty = e.target.value;
+      this.currentDifficulty = difficulty;
       this.ai.setDifficulty(difficulty);
     });
   }
 
-  // Handle placement mode selection (Manual vs Random)
   setupPlacementModeHandlers() {
     const manualModeBtn = document.getElementById('manual-mode-btn');
     const randomModeBtn = document.getElementById('random-mode-btn');
@@ -51,7 +54,6 @@ export class EventHandler {
       this.renderer.updateControlsVisibility(this.game.state, this.game.placementMode);
     });
 
-    // Handle changing placement mode (return to mode selection)
     changeModeBtn.addEventListener('click', () => {
       this.game.resetPlacementMode();
       this.selectedShip = null;
@@ -62,14 +64,12 @@ export class EventHandler {
     });
   }
 
-  // Handle manual ship placement interactions
   setupManualPlacementHandlers() {
     const shipTray = document.getElementById('ship-tray');
     const rotateBtn = document.getElementById('rotate-btn');
     const clearBtn = document.getElementById('clear-placement-btn');
     const playerBoard = document.getElementById('player-board');
 
-    // Ship selection from tray
     shipTray.addEventListener('click', (e) => {
       const shipPiece = e.target.closest('.ship-piece');
       if (!shipPiece) return;
@@ -83,13 +83,11 @@ export class EventHandler {
       }
     });
 
-    // Rotate button
     rotateBtn.addEventListener('click', () => {
       this.isHorizontal = !this.isHorizontal;
       this.renderer.clearPlacementPreview();
     });
 
-    // Clear all ships button
     clearBtn.addEventListener('click', () => {
       this.game.clearPlayerShips();
       this.selectedShip = null;
@@ -99,7 +97,6 @@ export class EventHandler {
       this.renderer.updateControlsVisibility(this.game.state, this.game.placementMode);
     });
 
-    // Player board hover for placement preview
     playerBoard.addEventListener('mousemove', (e) => {
       if (this.game.state !== GAME_STATES.SETUP_PLAYER || 
           this.game.placementMode !== PLACEMENT_MODES.MANUAL ||
@@ -118,12 +115,10 @@ export class EventHandler {
       this.renderer.showPlacementPreview(this.selectedShip, row, col, this.isHorizontal);
     });
 
-    // Player board mouse leave - clear preview
     playerBoard.addEventListener('mouseleave', () => {
       this.renderer.clearPlacementPreview();
     });
 
-    // Player board click for ship placement
     playerBoard.addEventListener('click', (e) => {
       if (this.game.state !== GAME_STATES.SETUP_PLAYER || 
           this.game.placementMode !== PLACEMENT_MODES.MANUAL ||
@@ -147,7 +142,6 @@ export class EventHandler {
       }
     });
 
-    // Right-click to rotate during placement
     playerBoard.addEventListener('contextmenu', (e) => {
       if (this.game.state === GAME_STATES.SETUP_PLAYER && 
           this.game.placementMode === PLACEMENT_MODES.MANUAL &&
@@ -165,7 +159,6 @@ export class EventHandler {
     });
   }
 
-  // Keyboard handlers for rotation
   setupKeyboardHandlers() {
     document.addEventListener('keydown', (e) => {
       if (this.game.state === GAME_STATES.SETUP_PLAYER && 
@@ -189,7 +182,11 @@ export class EventHandler {
     });
 
     startBtn.addEventListener('click', () => {
-      this.game.startGame();
+      const started = this.game.startGame();
+      if (started) {
+        this.gameFeatures.resetShotCount();
+        this.gameFeatures.showShotCounter();
+      }
       this.renderer.updateControlsVisibility(this.game.state, this.game.placementMode);
     });
   }
@@ -212,11 +209,22 @@ export class EventHandler {
       const result = this.game.playerAttack(row, col);
 
       if (result) {
+        this.gameFeatures.incrementShotCount();
+        
+        if (result.result === 'hit' || result.result === 'sunk') {
+          this.gameFeatures.playHitSound();
+        } else if (result.result === 'miss') {
+          this.gameFeatures.playMissSound();
+        }
+        
         this.renderer.renderBoards();
 
         if (this.game.state === GAME_STATES.GAME_OVER) {
           this.renderer.showGameOver(this.game.winner);
           this.renderer.updateControlsVisibility(this.game.state);
+          if (this.game.winner === 'player') {
+            this.gameFeatures.handleGameWin(this.currentDifficulty);
+          }
           return;
         }
 
@@ -230,7 +238,6 @@ export class EventHandler {
       return;
     }
 
-    // Update phase indicator to show AI turn
     this.renderer.updatePhaseIndicator(this.game.state);
 
     const move = this.ai.getNextMove(this.game.playerBoard);
@@ -242,7 +249,12 @@ export class EventHandler {
     const result = this.game.aiAttack(move.row, move.col);
 
     if (result) {
-      // Pass the result to recordAttack so AI can update its state
+      if (result.result === 'hit' || result.result === 'sunk') {
+        this.gameFeatures.playHitSound();
+      } else if (result.result === 'miss') {
+        this.gameFeatures.playMissSound();
+      }
+      
       this.ai.recordAttack(move.row, move.col, result);
       this.renderer.renderBoards();
       this.renderer.updatePhaseIndicator(this.game.state);
@@ -258,14 +270,14 @@ export class EventHandler {
     const restartBtn = document.getElementById('restart-btn');
     
     restartBtn.addEventListener('click', () => {
-      // Reset AI
       this.ai.reset();
       
-      // Reset placement state
       this.selectedShip = null;
       this.isHorizontal = true;
       
-      // Reset UI
+      this.gameFeatures.resetShotCount();
+      this.gameFeatures.hideShotCounter();
+      
       this.renderer.hideGameOver();
       this.renderer.clearMessages();
       this.game.restart();

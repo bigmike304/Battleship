@@ -5,6 +5,12 @@
   padding: 0;
 }
 
+/* Futura font stack for all UI text */
+:root {
+  --font-ui: Futura, "Trebuchet MS", Arial, sans-serif;
+  --font-title: "UnifrakturMaguntia", "Old English Text MT", serif;
+}
+
 #app {
   max-width: 1100px;
   margin: 0 auto;
@@ -16,6 +22,8 @@ h1 {
   margin-bottom: 20px;
   color: var(--accent);
   font-size: 2.5rem;
+  font-family: var(--font-title);
+  letter-spacing: 2px;
 }
 
 /* Phase Indicator */
@@ -80,6 +88,225 @@ h1 {
 
 .how-to-play-content li {
   margin-bottom: 8px;
+}
+
+.how-to-play-content h4 {
+  margin-top: 15px;
+  margin-bottom: 10px;
+  color: var(--accent);
+}
+
+.difficulty-descriptions {
+  list-style: disc;
+  margin-left: 20px;
+}
+
+.difficulty-descriptions li {
+  margin-bottom: 6px;
+}
+
+/* Player Name Section */
+.player-name-section {
+  text-align: center;
+  margin-bottom: 15px;
+  padding: 12px 20px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.player-name-section label {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.player-name-section input {
+  padding: 8px 12px;
+  font-size: 1rem;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  max-width: 200px;
+}
+
+.player-name-section input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Sound Toggle Section */
+.sound-toggle-section {
+  text-align: center;
+  margin-bottom: 15px;
+  padding: 12px 20px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.sound-toggle-section label {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.sound-toggle-btn {
+  padding: 6px 16px;
+  font-size: 0.9rem;
+  min-width: 60px;
+}
+
+.sound-toggle-btn.sound-on {
+  background: var(--success);
+  color: var(--bg);
+}
+
+.sound-toggle-btn.sound-off {
+  background: var(--muted);
+  color: var(--bg);
+}
+
+/* Shot Counter */
+.shot-counter {
+  text-align: center;
+  margin-bottom: 15px;
+  padding: 12px 20px;
+  background: var(--panel);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+}
+
+.shot-label {
+  color: var(--text);
+  margin-right: 8px;
+  font-weight: 500;
+}
+
+.shot-count {
+  color: var(--accent);
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+/* Leaderboard Panel */
+.leaderboard-panel {
+  background: var(--panel);
+  padding: 15px;
+  border-radius: var(--radius);
+  border: 1px solid var(--panel-border);
+  margin-top: 20px;
+}
+
+.leaderboard-panel h3 {
+  color: var(--accent);
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+.leaderboard-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.leaderboard-empty {
+  color: var(--muted);
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.leaderboard-table th {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.leaderboard-table td {
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.leaderboard-table tr:last-child td {
+  border-bottom: none;
+}
+
+.leaderboard-table .rank {
+  color: var(--muted);
+  width: 40px;
+}
+
+.leaderboard-table .score {
+  color: var(--success);
+  font-weight: bold;
+}
+
+.leaderboard-table .difficulty-easy {
+  color: var(--success);
+}
+
+.leaderboard-table .difficulty-normal {
+  color: var(--accent);
+}
+
+.leaderboard-table .difficulty-hard {
+  color: var(--danger);
+}
+
+.clear-leaderboard-btn {
+  margin-top: 15px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  background: var(--danger);
+  color: var(--bg);
+  border: none;
+  cursor: pointer;
+}
+
+.clear-leaderboard-btn:hover {
+  opacity: 0.9;
+}
+
+/* Score save message */
+.score-save-message {
+  text-align: center;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+}
+
+.score-save-message.error {
+  background: rgba(255, 106, 106, 0.2);
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
+
+.score-save-message.success {
+  background: rgba(85, 227, 182, 0.2);
+  color: var(--success);
+  border: 1px solid var(--success);
 }
 
 /* AI Difficulty Selector */
@@ -522,5 +749,20 @@ button:focus-visible {
   
   .phase-text {
     font-size: 1rem;
+  }
+  
+  .player-name-section {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .sound-toggle-section {
+    flex-direction: row;
+  }
+  
+  .leaderboard-table th,
+  .leaderboard-table td {
+    padding: 6px 8px;
+    font-size: 0.8rem;
   }
 }
